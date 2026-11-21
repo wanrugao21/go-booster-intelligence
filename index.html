@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Go Booster: Boutique Acquisition Copilot</title>
+<meta name="description" content="Go Booster: an AI-assisted boutique acquisition and outreach copilot for Booster in Central London (W1, SW1, WC, EC). Find, research, check fit, contact, email.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23143A2E'/%3E%3Cpath d='M20 44V20h14a8 8 0 0 1 0 16H26' stroke='%23C9A96A' stroke-width='6' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{
+  --green:#0F2A22; --green-2:#143A2E; --green-3:#1E4A3B; --ivory:#F6F1E7; --ivory-2:#EDE5D6; --paper:#FBF8F2;
+  --ink:#1B2420; --muted:#5E6B64; --gold:#B8975A; --gold-2:#9A7B43; --line:#DED5C3;
+  --real:#2E6B4F; --demo:#A35D52; --high:#B8975A; --medium:#5F7F95; --low:#A35D52;
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans: "Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+a{color:var(--green-3)}
+button,select,input,textarea{font:inherit}
+.topbar{background:var(--green);color:var(--ivory);position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(184,151,90,.45)}
+.topbar .in{max-width:1280px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-size:1.45rem;letter-spacing:.2px;white-space:nowrap;cursor:pointer}
+.brand b{color:var(--gold);font-weight:600}
+.brand small{display:block;font-family:var(--sans);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#C8D1C9}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+html,body{max-width:100%;overflow-x:hidden}
+#app,.card,.table-wrap{min-width:0}
+.grid>*{min-width:0}
+nav a{color:#DCE4DD;text-decoration:none;padding:7px 12px;border-radius:999px;font-size:.9rem;white-space:nowrap}
+nav a:hover{background:rgba(255,255,255,.08)}
+nav a.on{background:var(--ivory);color:var(--green)}
+.demo-toggle{display:flex;align-items:center;gap:8px;font-size:.82rem;color:#DCE4DD;white-space:nowrap}
+main{max-width:1280px;margin:0 auto;padding:26px 20px 60px}
+.eyebrow{color:var(--gold-2);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600}
+h1,h2,h3{font-family:var(--serif);font-weight:600;color:var(--green);margin:.2rem 0 .6rem}
+h1{font-size:2.3rem;line-height:1.15}
+h2{font-size:1.5rem}
+h3{font-size:1.15rem}
+.sub{color:var(--muted);max-width:820px;margin-top:-.2rem}
+.rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);border:0;margin:14px 0 20px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card.dark{background:var(--green-2);color:var(--ivory);border-color:var(--green-3)}
+.card.dark h2,.card.dark h3{color:var(--ivory)}
+.kpi .l{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-family:var(--serif);font-size:2.2rem;color:var(--green);line-height:1.1}
+.kpi .d{font-size:.8rem;color:var(--gold-2)}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.06em;margin:0 4px 4px 0;border:1px solid transparent;vertical-align:middle;white-space:nowrap}
+.b-real{background:#E3EFE8;color:var(--real);border-color:#B9D4C4}
+.b-demo{background:#F6E5E1;color:var(--demo);border-color:#E4C2BB}
+.b-fact{background:#E3EFE8;color:var(--real)}
+.b-assumption{background:#F5ECD9;color:var(--gold-2)}
+.b-unknown{background:#E8ECF0;color:#4D5D6B}
+.b-high{background:#F5ECD9;color:var(--gold-2)}.b-medium{background:#E4ECF2;color:var(--medium)}.b-low{background:#F6E5E1;color:var(--low)}
+.b-stage{background:var(--ivory-2);color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--green);background:var(--green);color:var(--ivory);padding:8px 16px;border-radius:999px;cursor:pointer;text-decoration:none;font-size:.9rem}
+.btn:hover{background:var(--green-3)}
+.btn.ghost{background:transparent;color:var(--green)}
+.btn.ghost:hover{background:var(--ivory-2)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1b1b14}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:8px 0 6px}
+.flow a{display:block;text-decoration:none;background:var(--green-2);color:var(--ivory);border-radius:12px;padding:12px 14px;position:relative;border:1px solid var(--green-3)}
+.flow a .n{color:var(--gold);font-size:.7rem;letter-spacing:.2em;font-weight:700}
+.flow a .t{font-family:var(--serif);font-size:1.15rem}
+.flow a .s{font-size:.78rem;color:#C8D1C9}
+.flow a.on{background:var(--gold);color:#1b1b14;border-color:var(--gold)}
+.flow a.on .n,.flow a.on .s{color:#3a3020}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{text-align:left;background:var(--ivory);color:var(--green);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+td{padding:9px 10px;border-bottom:1px solid #EFE8DA;vertical-align:top}
+tr.click{cursor:pointer}
+tr.click:hover td{background:#FBF6EC}
+.bar{height:7px;background:#EEE7DA;border-radius:6px;overflow:hidden;min-width:70px}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--gold-2),var(--gold))}
+.scorecell{display:flex;align-items:center;gap:8px;font-weight:600}
+.filters{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:10px;margin-bottom:12px}
+label.f{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block}
+input[type=text],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+textarea{min-height:300px;font-family:var(--sans);line-height:1.5}
+.crit{margin-bottom:12px}
+.crit .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.crit .pts{font-family:var(--serif);font-size:1.3rem;color:var(--green)}
+.list{margin:0;padding-left:1.1rem}
+.list li{margin-bottom:6px}
+.src{font-size:.78rem;color:var(--muted);word-break:break-all}
+.notice{border:1px dashed var(--demo);background:#FBEFEC;color:#6E3B33;border-radius:10px;padding:9px 12px;font-size:.86rem;margin-bottom:14px}
+.notice.ok{border-color:var(--real);background:#EAF3EE;color:#24513C}
+.notice.info{border-style:solid;border-color:var(--gold);background:#FAF3E4;color:#5A4723}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+.tabs a{text-decoration:none;padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:var(--green);background:#fff;font-size:.88rem}
+.tabs a.on{background:var(--green);color:var(--ivory);border-color:var(--green)}
+.tabs a .n{color:var(--gold-2);font-weight:700;margin-right:4px}
+.tabs a.on .n{color:var(--gold)}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+.pill-list{display:flex;flex-wrap:wrap;gap:6px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--ivory);padding:10px 18px;border-radius:999px;box-shadow:0 8px 30px rgba(0,0,0,.2);opacity:0;transition:opacity .25s;pointer-events:none;z-index:50;font-size:.9rem}
+.toast.show{opacity:1}
+.mapbox{background:var(--green);border-radius:14px;padding:10px;position:relative}
+.mapbox svg{width:100%;height:auto;display:block}
+.tip{position:absolute;background:#fff;color:var(--ink);border:1px solid var(--gold);border-radius:10px;padding:8px 10px;font-size:.82rem;pointer-events:none;display:none;max-width:260px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.legend span{display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:.82rem}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.slider{display:grid;grid-template-columns:200px 1fr 50px;gap:12px;align-items:center;margin-bottom:10px}
+.slider input{width:100%;accent-color:var(--green)}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;padding:18px 20px;text-align:center}
+.top-card{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #EFE8DA;padding:10px 0}
+.top-card:last-child{border-bottom:0}
+.rank{font-family:var(--serif);font-size:1.4rem;color:var(--gold-2);width:30px}
+.stagebar{display:grid;grid-template-columns:140px 1fr 30px;gap:10px;align-items:center;margin-bottom:6px;font-size:.85rem}
+.stagebar .b{height:12px;border-radius:6px;background:var(--green-3)}
+@media (max-width:900px){.g4,.g5{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){
+  main{padding:18px 16px 50px}.g2,.g3,.g4,.g5{grid-template-columns:1fr}.filters{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}h1{font-size:1.8rem}.slider{grid-template-columns:1fr 50px}.slider label{grid-column:1/-1}
+  .topbar .in{padding:8px 16px;gap:8px}nav{order:3;flex-basis:100%}.demo-toggle{margin-left:auto}
+  .flow{grid-template-columns:1fr 1fr}.flow a{padding:10px}.flow a .s{display:none}
+  #wshead{grid-template-columns:1fr 1fr!important}#wshead>div:first-child{grid-column:1/-1}
+  .stagebar{grid-template-columns:110px 1fr 24px}
+}
+@media print{.topbar,.toast,footer{display:none}main{max-width:none}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="in">
+  <div class="brand" onclick="go('#/dashboard')">Go <b>Booster</b><small>Boutique acquisition copilot</small></div>
+  <nav id="nav">
+    <a href="#/dashboard" data-v="dashboard">Dashboard</a>
+    <a href="#/prospects" data-v="prospects">Prospects</a>
+    <a href="#/p" data-v="p">Workspace</a>
+    <a href="#/map" data-v="map">Map</a>
+    <a href="#/scoring" data-v="scoring">Scoring model</a>
+    <a href="#/about" data-v="about">How it works</a>
+  </nav>
+  <label class="demo-toggle"><input type="checkbox" id="demoToggle" checked> Show demo records</label>
+</div></header>
+<main id="app" aria-live="polite"></main>
+<footer>
+  Go Booster is a competition prototype for the Claude x Booster Pitch Competition. It is not an official Booster product.
+  <b>REAL</b> records come from public research on official brand websites (see each source link); no brand has agreed to partner with Booster.
+  <b>DEMO</b> records are fictional and illustrative. Emails are drafts only: nothing is ever sent from this page.
+</footer>
+<div class="toast" id="toast"></div>
+<script id="app-data" type="application/json">{"demo":[{"name":"Maison Aurelle (DEMO)","address":"","postcode":"W1S","category":"Womenswear","price_tier":"Luxury","description":"Occasion-wear atelier known for silk eveningwear and made-to-order pieces.","website":"https://maison-aurelle.example","instagram_handle":"demo.maisonaurelle","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Qualified","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":48200,"google_rating":4.8,"review_count":126,"lat":51.51121,"lon":-0.14239,"geo_precision":"district centroid"},{"name":"Halden & Rowe Leather (DEMO)","address":"","postcode":"W1K","category":"Accessories & Leather Goods","price_tier":"Luxury","description":"Hand-finished leather bags and small leather goods made in England.","website":"https://haldenrowe.example","instagram_handle":"demo.haldenrowe","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Proposal Generated","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":31500,"google_rating":4.9,"review_count":88,"lat":51.51112,"lon":-0.15103,"geo_precision":"district centroid"},{"name":"Ottoline Fine Jewellery (DEMO)","address":"","postcode":"W1J","category":"Jewellery & Watches","price_tier":"Luxury","description":"Contemporary fine jewellery with a bespoke engagement ring service.","website":"https://ottoline-jewellery.example","instagram_handle":"demo.ottolinejewels","has_online_store":"Yes","ownership":"Independent","current_delivery":"None","status":"Contacted","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":22800,"google_rating":4.9,"review_count":64,"lat":51.50786,"lon":-0.14508,"geo_precision":"district centroid"},{"name":"The Marlowe Edit (DEMO)","address":"","postcode":"W1U","category":"Concept Store","price_tier":"Premium","description":"Curated concept store mixing emerging designers, gifts and stationery.","website":"https://marlowe-edit.example","instagram_handle":"demo.marloweedit","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Interested","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":15400,"google_rating":4.6,"review_count":210,"lat":51.5187,"lon":-0.15348,"geo_precision":"district centroid"},{"name":"Belgrave Row Menswear (DEMO)","address":"","postcode":"SW1X","category":"Menswear","price_tier":"Luxury","description":"Tailoring and relaxed luxury menswear with an in-house alterations service.","website":"https://belgraverow.example","instagram_handle":"demo.belgraverow","has_online_store":"Yes","ownership":"Small group","current_delivery":"Same-day / courier","status":"Researched","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":27300,"google_rating":4.7,"review_count":95,"lat":51.49824,"lon":-0.15675,"geo_precision":"district centroid"},{"name":"Pimlico Road Parfums (DEMO)","address":"","postcode":"SW1W","category":"Beauty & Fragrance","price_tier":"Luxury","description":"Niche fragrance house with refill bottles and private scent consultations.","website":"https://pimlicoparfums.example","instagram_handle":"demo.pimlicoparfums","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Qualified","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":9800,"google_rating":4.8,"review_count":57,"lat":51.49267,"lon":-0.1511,"geo_precision":"district centroid"},{"name":"St James's Cordwainers (DEMO)","address":"","postcode":"SW1Y","category":"Footwear","price_tier":"Luxury","description":"Traditional bench-made men's shoes and boots with a repair service.","website":"","instagram_handle":"demo.sjcordwainers","has_online_store":"No","ownership":"Independent","current_delivery":"None","status":"Discovered","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":6100,"google_rating":4.7,"review_count":41,"lat":51.50763,"lon":-0.13454,"geo_precision":"district centroid"},{"name":"Soho Atelier Nine (DEMO)","address":"","postcode":"W1F","category":"Womenswear","price_tier":"Contemporary","description":"Independent label studio-shop with limited seasonal drops.","website":"https://atelier-nine.example","instagram_handle":"demo.atelierninesoho","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Researched","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":12700,"google_rating":4.5,"review_count":73,"lat":51.51349,"lon":-0.13644,"geo_precision":"district centroid"},{"name":"Fitzrovia Vintage Archive (DEMO)","address":"","postcode":"W1T","category":"Vintage & Archive","price_tier":"Premium","description":"Archive designer pieces from the 1980s and 1990s, sourced by appointment.","website":"","instagram_handle":"demo.fitzarchive","has_online_store":"No","ownership":"Independent","current_delivery":"None","status":"Discovered","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":18900,"google_rating":4.4,"review_count":39,"lat":51.52029,"lon":-0.1367,"geo_precision":"district centroid"},{"name":"Wigmore & Finch (DEMO)","address":"","postcode":"W1G","category":"Accessories & Leather Goods","price_tier":"Premium","description":"Silk scarves, hats and gloves in seasonal colourways.","website":"https://wigmorefinch.example","instagram_handle":"demo.wigmorefinch","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Qualified","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":1800,"google_rating":4.6,"review_count":48,"lat":51.51933,"lon":-0.14827,"geo_precision":"district centroid"},{"name":"Fitzhardinge Linen House (DEMO)","address":"","postcode":"W1H","category":"Home & Lifestyle","price_tier":"Premium","description":"Linen bedding, tableware and candles for the home.","website":"https://fitzlinen.example","instagram_handle":"demo.fitzlinen","has_online_store":"Yes","ownership":"Independent","current_delivery":"Standard shipping only","status":"Discovered","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":5200,"google_rating":4.5,"review_count":31,"lat":51.5177,"lon":-0.16121,"geo_precision":"district centroid"},{"name":"Great Titchfield Studio (DEMO)","address":"","postcode":"W1W","category":"Womenswear","price_tier":"Contemporary","description":"Relaxed contemporary womenswear and knitwear.","website":"https://gtstudio.example","instagram_handle":"demo.gtstudio","has_online_store":"Yes","ownership":"Small group","current_delivery":"Standard shipping only","status":"Not Interested","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":4300,"google_rating":4.3,"review_count":52,"lat":51.51921,"lon":-0.14087,"geo_precision":"district centroid"},{"name":"Seven Dials Sneaker Lab (DEMO)","address":"","postcode":"WC2H","category":"Footwear","price_tier":"Contemporary","description":"Limited-edition trainers and collaborations.","website":"https://sdsneakerlab.example","instagram_handle":"demo.sdsneakerlab","has_online_store":"Yes","ownership":"Independent","current_delivery":"Same-day / courier","status":"Researched","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":61000,"google_rating":4.4,"review_count":380,"lat":51.51332,"lon":-0.12735,"geo_precision":"district centroid"},{"name":"Floral Street Atelier (DEMO)","address":"","postcode":"WC2E","category":"Womenswear","price_tier":"Contemporary","description":"Romantic prints and dresses from a small London label.","website":"https://floralatelier.example","instagram_handle":"demo.floralatelier","has_online_store":"Yes","ownership":"Independent","current_delivery":"Same-day / courier","status":"Qualified","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":23600,"google_rating":4.6,"review_count":140,"lat":51.51188,"lon":-0.12332,"geo_precision":"district centroid"},{"name":"Strand Gentlemen's Outfitter (DEMO)","address":"","postcode":"WC2N","category":"Menswear","price_tier":"Premium","description":"Shirts, ties and formalwear for theatre and events.","website":"","instagram_handle":"","has_online_store":"No","ownership":"Independent","current_delivery":"None","status":"Discovered","notes":"DEMO DATA: illustrative record with deliberately missing fields.","instagram_followers":null,"google_rating":4.2,"review_count":66,"lat":51.50913,"lon":-0.12492,"geo_precision":"district centroid"},{"name":"Bloomsbury Paper & Scent (DEMO)","address":"","postcode":"WC1A","category":"Concept Store","price_tier":"Unknown","description":"Stationery, candles and small gifts near the museums.","website":"","instagram_handle":"","has_online_store":"Unknown","ownership":"Unknown","current_delivery":"Unknown","status":"Discovered","notes":"DEMO DATA: sparse record to show low confidence.","instagram_followers":null,"google_rating":4.7,"review_count":190,"lat":51.52028,"lon":-0.12009,"geo_precision":"district centroid"},{"name":"Lamb's Conduit Tailors (DEMO)","address":"","postcode":"WC1N","category":"Menswear","price_tier":"Premium","description":"Workwear-inspired menswear and made-to-measure trousers.","website":"","instagram_handle":"demo.lctailors","has_online_store":"No","ownership":"Independent","current_delivery":"Standard shipping only","status":"Proposal Generated","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":8800,"google_rating":4.8,"review_count":77,"lat":51.52292,"lon":-0.11973,"geo_precision":"district centroid"},{"name":"Hatton Lane Diamonds (DEMO)","address":"","postcode":"EC1N","category":"Jewellery & Watches","price_tier":"Luxury","description":"Diamond engagement rings and bespoke wedding bands.","website":"https://hattonlane.example","instagram_handle":"demo.hattonlane","has_online_store":"Yes","ownership":"Independent","current_delivery":"None","status":"Contacted","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":14500,"google_rating":4.8,"review_count":212,"lat":51.51991,"lon":-0.10881,"geo_precision":"district centroid"},{"name":"Clerkenwell Kiln & Co (DEMO)","address":"","postcode":"EC1V","category":"Home & Lifestyle","price_tier":"Contemporary","description":"Hand-thrown ceramics and homeware from local makers.","website":"","instagram_handle":"demo.clerkenwellkiln","has_online_store":"No","ownership":"Independent","current_delivery":"None","status":"Discovered","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":2600,"google_rating":4.6,"review_count":28,"lat":51.5268,"lon":-0.09778,"geo_precision":"district centroid"},{"name":"Shoreditch Thread Co (DEMO)","address":"","postcode":"EC2A","category":"Menswear","price_tier":"Contemporary","description":"Streetwear and denim from emerging London designers.","website":"https://shoreditchthread.example","instagram_handle":"","has_online_store":"Unknown","ownership":"Unknown","current_delivery":"Unknown","status":"Discovered","notes":"DEMO DATA: sparse record to show low confidence.","instagram_followers":null,"google_rating":null,"review_count":null,"lat":51.52369,"lon":-0.08548,"geo_precision":"district centroid"},{"name":"Cheapside Watch Room (DEMO)","address":"","postcode":"EC2V","category":"Jewellery & Watches","price_tier":"Luxury","description":"Pre-owned luxury watches with servicing and authentication.","website":"https://cheapsidewatch.example","instagram_handle":"demo.cheapsidewatch","has_online_store":"Yes","ownership":"Small group","current_delivery":"Same-day / courier","status":"Qualified","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":11200,"google_rating":4.7,"review_count":59,"lat":51.51541,"lon":-0.09362,"geo_precision":"district centroid"},{"name":"Paternoster Leather Works (DEMO)","address":"","postcode":"EC4M","category":"Accessories & Leather Goods","price_tier":"Premium","description":"Briefcases, card holders and corporate gifting.","website":"https://paternosterleather.example","instagram_handle":"demo.paternosterleather","has_online_store":"Yes","ownership":"Unknown","current_delivery":"Standard shipping only","status":"Discovered","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":null,"google_rating":null,"review_count":null,"lat":51.51432,"lon":-0.09951,"geo_precision":"district centroid"},{"name":"Sloane Brand Flagship (DEMO)","address":"","postcode":"SW1X","category":"Womenswear","price_tier":"Luxury","description":"Flagship of an international luxury house.","website":"https://sloane-flagship.example","instagram_handle":"demo.sloaneflagship","has_online_store":"Yes","ownership":"Brand flagship","current_delivery":"Same-day / courier","status":"Researched","notes":"DEMO DATA: illustrative record for demonstration only.","instagram_followers":950000,"google_rating":4.4,"review_count":820,"lat":51.49824,"lon":-0.15675,"geo_precision":"district centroid"},{"name":"Chelsea Green Florist & Gifts (DEMO)","address":"","postcode":"SW3","category":"Home & Lifestyle","price_tier":"Premium","description":"Flowers, candles and gift hampers (outside target area).","website":"https://chelseagreengifts.example","instagram_handle":"demo.chelseagreengifts","has_online_store":"Yes","ownership":"Independent","current_delivery":"Same-day / courier","status":"Discovered","notes":"DEMO DATA: illustrative record outside the W1/SW1/WC/EC focus.","instagram_followers":8200,"google_rating":4.6,"review_count":94,"lat":51.48936,"lon":-0.16588,"geo_precision":"district centroid"},{"name":"Edgware Road Fashion Outlet (DEMO)","address":"","postcode":"W2","category":"Womenswear","price_tier":"Value","description":"Discount high-street fashion and end-of-line stock.","website":"","instagram_handle":"","has_online_store":"No","ownership":"Small group","current_delivery":"None","status":"Discovered","notes":"DEMO DATA: deliberately weak fit (value tier, outside target).","instagram_followers":null,"google_rating":3.6,"review_count":48,"lat":51.51522,"lon":-0.1852,"geo_precision":"district centroid"},{"name":"Camden Lock Vintage Stall (DEMO)","address":"","postcode":"NW1","category":"Vintage & Archive","price_tier":"Value","description":"Market stall selling second-hand clothing.","website":"","instagram_handle":"","has_online_store":"No","ownership":"Unknown","current_delivery":"None","status":"Discovered","notes":"DEMO DATA: deliberately weak fit with missing data.","instagram_followers":null,"google_rating":null,"review_count":null,"lat":51.5334,"lon":-0.14385,"geo_precision":"district centroid"},{"name":"Holborn Workwear Supplies (DEMO)","address":"","postcode":"WC1V","category":"Unknown","price_tier":"Value","description":"Uniform and workwear supplier.","website":"","instagram_handle":"","has_online_store":"Unknown","ownership":"Unknown","current_delivery":"Unknown","status":"Discovered","notes":"DEMO DATA: deliberately sparse and weak record.","instagram_followers":null,"google_rating":null,"review_count":null,"lat":51.51803,"lon":-0.11653,"geo_precision":"district centroid"}],"real":[{"research_rank":1,"research_score":"23/25","evidence_confidence":"High","name":"Oliver Spencer","aka":"","address":"58 Lamb's Conduit Street, London","postcode":"WC1N 3LW","other_locations":["39 Chiltern Street, London W1U 7PP","81 Berwick Street, London W1F 8TW"],"category":"Menswear","price_tier":"Premium","ownership":"Small group","current_delivery":"Same-day / courier","has_online_store":"Yes","description":"Contemporary luxury menswear, tailored jackets, organic cotton shirting, knitwear, footwear and accessories.","website":"https://oliverspencer.co.uk","contact_email":"info@oliverspencer.co.uk","contact_phone":"020 7269 6444","contact_page":"https://oliverspencer.co.uk/pages/faq","contact_routes":["Email info@oliverspencer.co.uk (general)","Phone 020 7269 6444 (Lamb's Conduit Street shop)","FAQ: https://oliverspencer.co.uk/pages/faq","Delivery & returns: https://oliverspencer.co.uk/pages/delivery-and-returns","Partnership / press / wholesale contact: none published on the cited pages"],"evidence_url":"https://oliverspencer.co.uk/pages/delivery-and-returns","source_urls":["https://oliverspencer.co.uk/pages/delivery-and-returns","https://oliverspencer.co.uk/pages/faq","https://oliverspencer.co.uk/products/brook-shirt-dobson-beige"],"facts":[{"text":"Shop at 58 Lamb's Conduit Street, London WC1N 3LW, plus London shops at 39 Chiltern Street (W1U 7PP) and 81 Berwick Street (W1F 8TW).","source":"https://oliverspencer.co.uk"},{"text":"Website offers \"Same-day delivery in central London by phone (charged, quoted on request)\".","source":"https://oliverspencer.co.uk/pages/delivery-and-returns"},{"text":"Product pages include a store-level stock checker (check whether a piece is in stock in a specific store before buying).","source":"https://oliverspencer.co.uk/products/brook-shirt-dobson-beige"},{"text":"Click & Collect, and tracked UK courier delivery at £7 (free over £150), 1–2 working days.","source":"https://oliverspencer.co.uk/pages/delivery-and-returns"},{"text":"Public general email info@oliverspencer.co.uk; Lamb's Conduit Street shop phone 020 7269 6444.","source":"https://oliverspencer.co.uk/pages/faq"}],"positioning":"Independent British modern menswear house blending Savile Row tailoring discipline with a relaxed, everyday London sensibility.","target_customer":"Design-conscious professionals, creative directors and affluent urban residents across Bloomsbury, Marylebone and Soho.","distinctive":"Signature Buffalo jackets, New York Special shirts, in-store alterations/repairs and personal shopping.","why_local":"They already field manual phone requests for Central London same-day delivery; Booster could automate quoting, dispatch and tracking at checkout across three Central London stores.","angle":"Booster can turn Oliver Spencer's manual, phone-quoted Central London same-day delivery into an automated, one-click 60-minute checkout experience powered by your existing WC1 and W1 store inventory.","fit_notes":[["Brand & audience fit","5/5","Quintessential independent London label with dense customer overlap in WC1 and W1."],["Product suitability","4/5","Shirts, knitwear and light outerwear fold neatly into courier bags; minor deduction for multi-size fit variance."],["Customer use case","5/5","Last-minute event dressing, travel packing emergencies and gifting, supported by the existing phone-quoted same-day service."],["Operational fit","4/5","Three Central London stores (WC1N, W1U, W1F) spread picking load and shorten courier distances."],["Digital readiness","5/5","Per-store stock visibility and Click & Collect indicate strong POS-to-web inventory visibility."]],"objections":["Inventory accuracy: does the per-store stock checker update in real time or batch-sync overnight?","Store picking & packing: can Lamb's Conduit Street pack and tissue-wrap an order within 10–15 minutes at Saturday peaks?","Courier handover: where do couriers stage on pedestrian-heavy Lamb's Conduit Street?","Delivery reliability: how are orders split across WC1N and W1U stock handled?","Returns & CS: will 1-hour orders follow the standard 14-day exchange / refund policy?","Customer demand: how many phone same-day requests does the team field per week?","Commercial economics: what minimum order value (e.g. the £150 free-shipping threshold) makes the economics work?"],"unknowns":["Ecommerce platform stack","Weekly volume of phone same-day delivery requests","Store-level POS API capabilities","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello Oliver Spencer team,","subject":"Automating your central London same-day delivery","hook":"I noticed that your delivery page offers same-day delivery in central London by phone, quoted on request, and that your product pages already let customers check whether a piece is in stock at a specific shop. Few boutiques publish either, and it suggests your customers are already asking for speed.","value":"Booster could turn that phone-quoted service into a one-click option at checkout, fulfilled from Lamb's Conduit Street, Chiltern Street or Berwick Street, whichever is nearest the customer. Your team would no longer need to quote and arrange each delivery by hand.","question":"I'd be curious how many same-day requests the shops handle by phone in a typical week.","visit":"Lamb's Conduit Street","followup_topic":"automating the same-day requests your shops already take by phone","area":"your three Central London shops"},"status":"Researched","lat":51.52207,"lon":-0.11842,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":2,"research_score":"22/25","evidence_confidence":"High","name":"Rococo Chocolates","aka":"","address":"3 Moxon Street, Marylebone, London","postcode":"W1U 4EP","other_locations":[],"category":"Food & Confectionery Gifting","price_tier":"Premium","ownership":"Independent","current_delivery":"Same-day / courier","has_online_store":"Yes","description":"Luxury artisan chocolate boxes, fresh truffles, chocolate thins, bars and bespoke gift hampers.","website":"https://www.rococochocolates.com","contact_email":"3moxonstreet@rococochocolates.com","contact_phone":"020 3925 8777","contact_page":"https://www.rococochocolates.com/pages/marylebone","contact_routes":["Email 3moxonstreet@rococochocolates.com (Marylebone shop)","Phone 020 3925 8777","Store page: https://www.rococochocolates.com/pages/marylebone","Corporate gifting category on site; no separate corporate email published on the cited page"],"evidence_url":"https://www.rococochocolates.com/pages/marylebone","source_urls":["https://www.rococochocolates.com/pages/marylebone"],"facts":[{"text":"Shop at 3 Moxon Street, Marylebone, London W1U 4EP.","source":"https://www.rococochocolates.com/pages/marylebone"},{"text":"Marylebone store page states: \"Same Day Delivery: Need chocolates urgently? Contact our shop to discuss our same-day delivery options.\"","source":"https://www.rococochocolates.com/pages/marylebone"},{"text":"Shopify-powered webstore with gifting filters (corporate, thank you, grand gesture) and a Corporate Gifting category.","source":"https://www.rococochocolates.com"},{"text":"Public shop email 3moxonstreet@rococochocolates.com and phone 020 3925 8777.","source":"https://www.rococochocolates.com/pages/marylebone"}],"positioning":"Independent British luxury chocolatier (founded 1983, per research) known for illustrated packaging and gourmet confectionery.","target_customer":"Affluent Marylebone residents, corporate executive assistants, hotel concierges and celebratory gift buyers.","distinctive":"Bespoke curated gift hampers, artisan truffles and signature Bee Bars.","why_local":"Chocolate gifting is impulse- and deadline-driven, yet urgent local orders currently require manual phone/email coordination with the Moxon Street shop.","angle":"Booster can replace manual email and phone coordination on your Marylebone store's urgent same-day chocolate orders with an automated 1-hour London gifting checkout.","fit_notes":[["Brand & audience fit","4/5","Beloved independent London luxury gifting brand with strong Marylebone and Mayfair recognition."],["Product suitability","5/5","Lightweight, compact, standardised gift boxes and hampers with no sizing/fit return risk."],["Customer use case","5/5","Immediate corporate and personal gifting, evidenced by the store page inviting urgent same-day enquiries."],["Operational fit","4/5","Moxon Street is just off Marylebone High Street; summer temperature control is a factor."],["Digital readiness","4/5","Shopify makes checkout integration straightforward; store vs warehouse inventory split unverified."]],"objections":["Inventory accuracy: does 3 Moxon Street carry the full online range or only core retail boxes?","Store picking & packing: can staff add gift notes and ribbons within a 10-minute dispatch window?","Courier handover: where is the fastest two-wheel pickup point near Marylebone High Street?","Delivery reliability: how are delicate truffles protected against heat or tilting in transit?","Returns & CS: perishables are typically non-returnable; how are damaged-in-transit replacements triggered?","Customer demand: how many urgent same-day requests does the shop receive weekly?","Commercial economics: with gift boxes around £25–£75+, what minimum basket protects margin?"],"unknowns":["Whether online orders ship from a central warehouse or the Moxon Street shop","Average order value","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello to the Moxon Street team,","subject":"Urgent chocolate gifts from Moxon Street, at checkout","hook":"Your Marylebone shop page invites customers who need chocolates urgently to contact the shop about same-day delivery. That kind of gifting runs on deadlines: a client thank-you, a dinner host, a birthday.","value":"Booster could make that a checkout option rather than an email or phone conversation, collected from 3 Moxon Street and delivered across Central London within the hour. Boxed chocolates and hampers suit this well, with no sizing returns to worry about.","question":"I'd love to understand how often urgent requests reach the shop, and how you handle heat-sensitive pieces in summer.","visit":"Moxon Street","followup_topic":"turning the shop's urgent same-day requests into a checkout option","area":"Marylebone and the West End"},"status":"Researched","lat":51.51972,"lon":-0.15223,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":3,"research_score":"21/25","evidence_confidence":"High","name":"Perfumer H","aka":"","address":"19 Chiltern Street, Marylebone, London","postcode":"W1U 7PH","other_locations":["15a Clifford Street, Mayfair, London W1S 4JZ","106a Crawford Street, London W1H 2HZ (by appointment)"],"category":"Beauty & Fragrance","price_tier":"Luxury","ownership":"Small group","current_delivery":"Standard shipping only","has_online_store":"Yes","description":"Independent haute parfumerie (50ml/100ml perfumes), handblown glass candles, incense, bath & body and pantry items.","website":"https://www.perfumerh.com","contact_email":"chilternstreet@perfumerh.com","contact_phone":"","contact_page":"https://www.perfumerh.com/pages/perfumer-h-shops","contact_routes":["Email chilternstreet@perfumerh.com (Chiltern Street boutique)","Email cliffordstreet@perfumerh.com (Clifford Street boutique)","Email crawfordstreet@perfumerh.com (Crawford Street, by appointment)","Shops page: https://www.perfumerh.com/pages/perfumer-h-shops","Partnership / press / wholesale contact: none published on the store directory page"],"evidence_url":"https://www.perfumerh.com/pages/perfumer-h-shops","source_urls":["https://www.perfumerh.com/pages/perfumer-h-shops","https://www.perfumerh.com/products/marmalade-candle-refill"],"facts":[{"text":"Boutique at 19 Chiltern Street, Marylebone (W1U 7PH), plus 15a Clifford Street, Mayfair (W1S 4JZ) and 106a Crawford Street (W1H 2HZ, by appointment).","source":"https://www.perfumerh.com/pages/perfumer-h-shops"},{"text":"Complimentary UK delivery on orders of £75 and above (1–3 business days); £5 below £75.","source":"https://www.perfumerh.com/products/marmalade-candle-refill"},{"text":"Published boutique emails: chilternstreet@, cliffordstreet@ and crawfordstreet@perfumerh.com.","source":"https://www.perfumerh.com/pages/perfumer-h-shops"}],"positioning":"Cult British artisanal perfumery founded by Lyn Harris, known for apothecary-style handblown glass vessels and refillable fragrances.","target_customer":"Discerning fragrance collectors, design-literate Marylebone/Mayfair shoppers and high-net-worth gift buyers.","distinctive":"Handblown refillable perfume and candle vessels, bespoke scent consultations and a £25 online Sample Service.","why_local":"Most full-size fragrances and candles exceed the £75 free-delivery threshold, so order values could support premium 1-hour delivery across Central London.","angle":"Booster can turn Perfumer H's Chiltern Street and Clifford Street boutiques into 1-hour white-glove gifting hubs, upgrading 1–3 day shipping to same-hour delivery for Central London clients.","fit_notes":[["Brand & audience fit","5/5","Flagship independent W1 luxury house on Chiltern Street and Clifford Street."],["Product suitability","4/5","High value-to-weight, but handblown glass needs cushioned packaging and upright handling."],["Customer use case","5/5","Last-minute luxury gifting and replenishment of signature scents and candles."],["Operational fit","3/5","Two walk-in W1 boutiques give dual West End coverage; fragile glass needs careful packing."],["Digital readiness","4/5","Modern ecommerce with structured UK shipping tiers; store-level stock sync unverified."]],"objections":["Inventory accuracy: do the W1U and W1S boutiques track stock in the same system as online?","Store picking & packing: how long does protective boxing and gift wrapping take in-boutique?","Courier handover: can couriers carry fragile handblown glass upright without damage?","Delivery reliability: will signature-on-delivery be available for £150–£300+ items?","Returns & CS: what happens if a bottle leaks or breaks in transit?","Customer demand: what share of UK online orders come from Central London postcodes?","Commercial economics: can the courier experience match Perfumer H's aesthetic?"],"unknowns":["POS software used across the three W1 locations","Share of customers in Central London","Shop phone number (not in research)","Postcode discrepancy to confirm: store page W1U 7PH vs map listing W1U 7PQ","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello to the Chiltern Street team,","subject":"Same-hour delivery from Chiltern Street and Clifford Street","hook":"With boutiques on Chiltern Street and Clifford Street, and complimentary UK delivery on orders over £75 in 1–3 business days, Perfumer H already serves many Central London clients who live or work a short journey from your shops.","value":"Booster could let those clients receive a fragrance or candle from the nearest boutique within the hour, which suits last-minute gifts. We know handblown glass needs careful packing and upright handling, and we'd want to agree that standard with you before anything else.","question":"Do the W1 boutiques share stock records with the online shop, or are they managed separately?","visit":"Chiltern Street","followup_topic":"same-hour delivery from your Chiltern Street and Clifford Street boutiques","area":"Marylebone and Mayfair"},"status":"Researched","lat":51.5191,"lon":-0.15508,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":4,"research_score":"20/25","evidence_confidence":"High","name":"Floris London","aka":"J. Floris Ltd","address":"89 Jermyn Street, St James's, London","postcode":"SW1Y 6JH","other_locations":[],"category":"Beauty & Fragrance","price_tier":"Luxury","ownership":"Independent","current_delivery":"Unknown","has_online_store":"Yes","description":"Heritage fine fragrances, luxury bath & body, shaving & grooming, home fragrances and gift sets.","website":"https://www.florislondon.com","contact_email":"customerservice@florislondon.com","contact_phone":"+44 (0) 3301 340180","contact_page":"https://www.florislondon.com/pages/contact-us","contact_routes":["Email customerservice@florislondon.com (customer service)","Phone +44 (0) 3301 340180","Contact page: https://www.florislondon.com/pages/contact-us","Partnership / press / wholesale contact: none published on the cited contact page"],"evidence_url":"https://www.florislondon.com/pages/contact-us","source_urls":["https://www.florislondon.com/pages/contact-us","https://www.florislondon.com/policies/shipping-policy","https://www.florislondon.com/policies/privacy-policy"],"facts":[{"text":"Flagship shop at 89 Jermyn Street, St James's, London SW1Y 6JH.","source":"https://www.florislondon.com/pages/contact-us"},{"text":"Active UK ecommerce with a published shipping policy and tracked carrier dispatch.","source":"https://www.florislondon.com/policies/shipping-policy"},{"text":"Public customer service email customerservice@florislondon.com and phone +44 (0) 3301 340180.","source":"https://www.florislondon.com/pages/contact-us"}],"positioning":"Described in the research as Britain's oldest independent family-owned perfumer (established 1730) and a Royal Warrant holder.","target_customer":"International Mayfair/St James's hotel guests, traditional British luxury buyers and diplomatic/corporate gift purchasers.","distinctive":"Signature English scents (e.g. No. 89), bespoke perfumery consultations and crested gift boxes.","why_local":"89 Jermyn Street is surrounded by five-star hotels and private members' clubs; 1-hour delivery could capture high-spending travellers and last-minute hosts.","angle":"Booster can extend Floris London's 89 Jermyn Street hospitality directly to Mayfair and St James's hotels, residences and offices within 60 minutes of an online order.","fit_notes":[["Brand & audience fit","5/5","Quintessential SW1 independent heritage luxury house."],["Product suitability","4/5","Compact boxed bottles and grooming sets; glass bottles need padded pouches."],["Customer use case","4/5","Hotel concierge requests, last-minute host gifts and travel grooming replacements."],["Operational fit","3/5","Single Central London flagship concentrates all orders on one store team."],["Digital readiness","4/5","Mature ecommerce operation with formal shipping policies."]],"objections":["Inventory accuracy: is Jermyn Street stock tracked separately from the ecommerce warehouse?","Store picking & packing: is there back-of-house space to prepare courier parcels?","Courier handover: Jermyn Street has loading restrictions; can two-wheel couriers collect smoothly?","Delivery reliability: can deliveries go to hotel concierge desks with recipient sign-off?","Returns & CS: how are scent exchanges handled for gift recipients?","Customer demand: what share of web orders ship to SW1 and W1?","Commercial economics: pass an express fee to customers, or subsidise above an order threshold?"],"unknowns":["Ecommerce warehouse location vs Jermyn Street stock allocation","Current same-day courier arrangements, if any","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello Floris London team,","subject":"From 89 Jermyn Street to St James's hotels within the hour","hook":"89 Jermyn Street sits a few minutes from many of St James's and Mayfair's hotels, residences and offices, while online orders are currently dispatched by tracked carrier under your UK shipping policy.","value":"Booster could add an option for nearby customers to receive Floris fragrances and gift sets from Jermyn Street within the hour, for example a hotel guest who needs a gift that evening or a host buying at the last minute. We'd want deliveries to concierge desks, with sign-off, to meet the standard of the shop.","question":"Is Jermyn Street stock managed separately from online fulfilment, and do you offer any same-day arrangement today?","visit":"Jermyn Street","followup_topic":"same-hour delivery from 89 Jermyn Street to nearby hotels and offices","area":"St James's and Mayfair"},"status":"Researched","lat":51.50809,"lon":-0.13717,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":5,"research_score":"20/25","evidence_confidence":"High","name":"Drake's","aka":"","address":"9 Savile Row, Mayfair, London","postcode":"W1S 3PF","other_locations":[],"category":"Menswear","price_tier":"Luxury","ownership":"Independent","current_delivery":"Standard shipping only","has_online_store":"Yes","description":"Handcrafted silk ties, pocket squares, scarves, tailored suits, Oxford shirts, knitwear and men's accessories.","website":"https://www.drakes.com","contact_email":"concierge@drakes.com","contact_phone":"+44 (0) 20 7734 2367","contact_page":"https://www.drakes.com/pages/our-stores","contact_routes":["Email concierge@drakes.com (concierge)","Email productenquiries@drakes.com (product enquiries)","Phone +44 (0) 20 7734 2367 (store)","Stores page: https://www.drakes.com/pages/our-stores","Partnership / press / wholesale contact: none separately published on the cited pages"],"evidence_url":"https://www.drakes.com/pages/delivery","source_urls":["https://www.drakes.com/pages/our-stores","https://www.drakes.com/pages/delivery"],"facts":[{"text":"Shop at 9 Savile Row, Mayfair, London W1S 3PF.","source":"https://www.drakes.com/pages/our-stores"},{"text":"UK orders ship via DHL Express at a £7.95 flat rate: \"Please allow two working days for delivery once the order has been dispatched\".","source":"https://www.drakes.com/pages/delivery"},{"text":"Public emails concierge@drakes.com and productenquiries@drakes.com; store phone +44 (0) 20 7734 2367.","source":"https://www.drakes.com/pages/our-stores"}],"positioning":"Independent British luxury menswear and haberdashery house known for relaxed elegance and handmade English accessories.","target_customer":"International style enthusiasts, Mayfair/City executives and high-income professionals.","distinctive":"Hand-rolled silk ties and pocket squares, Games tailoring and Made-to-Order appointments.","why_local":"Even within London, standard DHL Express quotes about two working days; a same-hour option from Savile Row removes friction for urgent event and gifting purchases.","angle":"Booster can upgrade Drake's current two-working-day London DHL Express wait into a 60-minute Savile Row concierge delivery for urgent ties, shirts and gifts.","fit_notes":[["Brand & audience fit","5/5","Premier independent Savile Row luxury name with high basket values."],["Product suitability","4/5","Ties, pocket squares, scarves and folded shirts are compact and non-fragile."],["Customer use case","4/5","Last-minute black-tie/business accessories and executive gifting in W1 and EC."],["Operational fit","3/5","Single London flagship limits origin to W1, though W1 is central."],["Digital readiness","4/5","Full ecommerce with concierge support; store-level stock lookup not exposed."]],"objections":["Inventory accuracy: are online orders fulfilled from a warehouse rather than 9 Savile Row?","Store picking & packing: can floor staff pick online orders without disrupting Made-to-Order appointments?","Courier handover: Savile Row is narrow and busy; how quickly can a courier collect?","Delivery reliability: how are folded shirts and tailoring kept crease-free?","Returns & CS: can 1-hour orders be returned to 9 Savile Row?","Customer demand: what share of UK web orders ship to Central London?","Commercial economics: position 1-hour delivery as a premium concierge add-on?"],"unknowns":["Warehouse vs Savile Row stock integration","Central London order density","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello Drake's concierge team,","subject":"From Savile Row in an hour, not two working days","hook":"Your delivery page asks UK customers to allow two working days for DHL Express delivery once an order is dispatched. For a client in Mayfair or the City who needs a tie or pocket square before an evening event, that can be too late.","value":"Booster could offer those customers a same-hour option, collected from 9 Savile Row. Ties, pocket squares and folded shirts are compact and well suited to rapid delivery, and the service could sit alongside your existing options as a premium concierge add-on.","question":"Are online orders fulfilled from Savile Row today, or from a separate warehouse?","visit":"Savile Row","followup_topic":"a same-hour delivery option from 9 Savile Row","area":"Mayfair and the City"},"status":"Researched","lat":51.51078,"lon":-0.14011,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":6,"research_score":"19/25","evidence_confidence":"Medium","name":"Tateossian","aka":"Tateossian London","address":"27 Conduit Street, Mayfair, London","postcode":"W1S 2XZ","other_locations":["Historically 4 Royal Exchange (EC3V) and 55 Sloane Square (SW1W); current status unconfirmed"],"category":"Jewellery & Watches","price_tier":"Luxury","ownership":"Independent","current_delivery":"Unknown","has_online_store":"Yes","description":"Luxury cufflinks, men's and women's bracelets, necklaces, rings and precious-metal accessories.","website":"https://www.tateossian.com","contact_email":"aftersales@tateossian.com","contact_phone":"020 7499 9924","contact_page":"https://www.tateossian.com/","contact_routes":["Email aftersales@tateossian.com (aftersales: ask for the email to be forwarded)","Phone 020 7499 9924 (Conduit Street boutique)","Website: https://www.tateossian.com/","Corporate portal referenced in site footer; no separate email published in the retrieved snippet"],"evidence_url":"https://www.tateossian.com/","source_urls":["https://www.tateossian.com/","https://us.tateossian.com/pages/a-message-from-robert-tateossian"],"facts":[{"text":"Flagship boutique at 27 Conduit Street, Mayfair, London W1S 2XZ.","source":"https://www.tateossian.com/"},{"text":"Active multi-region ecommerce with virtual styling appointments; catalogue price points around £315–£550.","source":"https://www.tateossian.com/"},{"text":"Public aftersales email aftersales@tateossian.com; Conduit Street boutique phone 020 7499 9924.","source":"https://www.tateossian.com/"}],"positioning":"Independent British luxury jewellery and cufflinks house (founded 1990 by Robert Tateossian, per research).","target_customer":"City finance executives, black-tie event attendees and corporate or milestone gift buyers.","distinctive":"Mechanical gear and tourbillon cufflinks, sterling silver/18K gold bracelets and engraving services.","why_local":"Cufflinks and bracelets are tiny, light, high-ticket items, suited to last-minute evening-dress needs and urgent client gifts in Mayfair and the City.","angle":"Booster can turn Tateossian's Conduit Street flagship into an instant 60-minute luxury delivery point for Mayfair and City clients needing last-minute cufflinks or executive gifts.","fit_notes":[["Brand & audience fit","4/5","Established independent London accessories brand with corporate gifting resonance."],["Product suitability","5/5","Smallest, lightest and highest value-density items on the shortlist."],["Customer use case","4/5","Forgotten cufflinks before a gala or dinner, and same-day executive gifting."],["Operational fit","3/5","Verified Conduit Street flagship; high-value jewellery needs chain-of-custody and ID/PIN checks."],["Digital readiness","3/5","Active ecommerce, but UK store-level stock and London shipping terms not publicly detailed."]],"objections":["Inventory accuracy: does 27 Conduit Street keep live digital stock records for online checkout?","Store picking & packing: can staff seal tamper-evident boxes quickly at peak times?","Courier handover: what insurance covers £300–£1,000+ items in transit?","Delivery reliability: is recipient PIN/signature verification available?","Returns & CS: how are returns handled for high-value items delivered by a third-party courier?","Customer demand: what share of orders need same-day London delivery?","Commercial economics: does per-parcel insurance erode margin on £150–£250 pieces?"],"unknowns":["UK-specific delivery policy and shipping rates","Current operating status of the Royal Exchange (EC3V) and Sloane Square (SW1W) units","Whether any same-day delivery is offered today","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello Tateossian team,","subject":"Last-minute cufflinks from Conduit Street, within the hour","hook":"I'm writing to your aftersales address because it is the public contact I could find, and I'd be grateful if you could pass this to whoever looks after retail partnerships. Cufflinks are exactly what people realise they need an hour before a black-tie dinner or an important meeting, and your boutique at 27 Conduit Street is right in the middle of Mayfair.","value":"Booster could deliver from Conduit Street to nearby offices, hotels and homes within the hour. We understand that fine jewellery needs secure handover, insurance cover and recipient verification, and we'd want to agree those with you first.","question":"Do you offer any same-day delivery in London today, and can the online shop see Conduit Street's stock?","visit":"Conduit Street","followup_topic":"same-hour delivery of cufflinks and gifts from Conduit Street","area":"Mayfair and the City"},"status":"Researched","lat":51.51156,"lon":-0.14302,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":7,"research_score":"19/25","evidence_confidence":"High","name":"Bella Freud","aka":"","address":"49 Chiltern Street, Marylebone, London","postcode":"W1U 6LX","other_locations":[],"category":"Fashion & Lifestyle","price_tier":"Luxury","ownership":"Independent","current_delivery":"Standard shipping only","has_online_store":"Yes","description":"Designer merino/cashmere knitwear, scented candles, cushions, ready-to-wear and luxury gifting.","website":"https://bellafreud.com","contact_email":"customercare@bellafreud.com","contact_phone":"","contact_page":"https://bellafreud.com/pages/contact-us","contact_routes":["Email customercare@bellafreud.com (customer care, monitored Mon–Fri 10am–4pm)","Email info@bellafreud.com (general)","Contact page: https://bellafreud.com/pages/contact-us","Partnership / press / wholesale contact: none separately published on the cited contact page"],"evidence_url":"https://bellafreud.com/pages/contact-us","source_urls":["https://bellafreud.com/pages/contact-us","https://bellafreud.com/collections/meet-the-team"],"facts":[{"text":"Flagship boutique at 49 Chiltern Street, Marylebone, London (contact page postcode W1U 6LX).","source":"https://bellafreud.com/pages/contact-us"},{"text":"Free next-day UK delivery on orders over £350; standard paid delivery below £350.","source":"https://bellafreud.com"},{"text":"Public emails customercare@bellafreud.com and info@bellafreud.com, monitored Mon–Fri 10am–4pm.","source":"https://bellafreud.com/pages/contact-us"}],"positioning":"Cult independent British fashion and lifestyle label founded by designer Bella Freud, anchored on Chiltern Street.","target_customer":"Fashion-forward London creatives, media professionals, celebrity stylists and luxury gift shoppers.","distinctive":"Slogan knitwear, signature scented candles and bookable in-store styling appointments.","why_local":"Stylist pulls, last-minute party knitwear and candle gifts are classic same-hour use cases; core jumpers already exceed the £350 free-delivery threshold.","angle":"Booster can upgrade Bella Freud's free next-day delivery on £350+ orders into an instant 60-minute dispatch from 49 Chiltern Street for London clients and stylists.","fit_notes":[["Brand & audience fit","5/5","High cultural cachet in Marylebone with loyal Central London clientele."],["Product suitability","4/5","Folded knitwear is durable; boxed candles are compact but contain glass."],["Customer use case","4/5","Stylist pulls, event outfits and candle gifting across W1/WC/SW1."],["Operational fit","3/5","Single boutique with a small sales team; picking must stay lightweight."],["Digital readiness","3/5","Clear £350 next-day logic, but no public store-stock feed or same-day option."]],"objections":["Inventory accuracy: does 49 Chiltern Street share live inventory with bellafreud.com?","Store picking & packing: can staff pack orders within 15 minutes alongside appointments?","Courier handover: where is the best pickup spot on narrow Chiltern Street?","Delivery reliability: can Booster support stylist/editorial drops that need a named recipient handoff?","Returns & CS: how are size exchanges on £350+ knitwear handled?","Customer demand: what share of £350+ orders come from Central London?","Commercial economics: offer free 1-hour delivery above £350, mirroring next-day?"],"unknowns":["Warehouse vs boutique stock split","Weekend customer care staffing (inbox monitored Mon–Fri only)","Shop phone number (not in research)","Postcode discrepancy to confirm: contact page W1U 6LX vs map listing W1U 6LY","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello Bella Freud team,","subject":"From 49 Chiltern Street to London clients within the hour","hook":"You offer free next-day UK delivery on orders over £350. For London clients, stylists and last-minute gift buyers, 49 Chiltern Street is often much closer than next day.","value":"Booster could deliver knitwear and candles from the boutique within the hour, perhaps free above the same £350 threshold, with your team only needing to pack the order.","question":"Is web stock held at the boutique or elsewhere, and how are size exchanges usually handled?","visit":"Chiltern Street","followup_topic":"same-hour delivery from 49 Chiltern Street","area":"Marylebone and the West End"},"status":"Researched","lat":51.51984,"lon":-0.15561,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":8,"research_score":"18/25","evidence_confidence":"High","name":"D. R. Harris & Co. Ltd","aka":"D. R. Harris & Co.","address":"29 St. James's Street, London","postcode":"SW1A 1HD","other_locations":[],"category":"Beauty & Fragrance","price_tier":"Premium","ownership":"Independent","current_delivery":"Unknown","has_online_store":"Yes","description":"Traditional British colognes, shaving soaps/creams, grooming kits, skincare, bath soaps and travel accessories.","website":"https://www.drharris.co.uk","contact_email":"sales@drharris.co.uk","contact_phone":"","contact_page":"https://www.drharris.co.uk/contact-us","contact_routes":["Email sales@drharris.co.uk (sales)","Email wholesale@drharris.co.uk (wholesale)","Email press@drharris.co.uk (press)","Contact page: https://www.drharris.co.uk/contact-us","Do NOT use pharmacy@drharris.co.uk: pharmacy/prescription items are out of scope"],"evidence_url":"https://www.drharris.co.uk/contact-us","source_urls":["https://www.drharris.co.uk/contact-us"],"facts":[{"text":"Shop at 29 St. James's Street, London SW1A 1HD.","source":"https://www.drharris.co.uk/contact-us"},{"text":"Active ecommerce webstore with separate order, wholesale and press contact channels.","source":"https://www.drharris.co.uk/contact-us"},{"text":"Published emails: sales@, wholesale@ and press@drharris.co.uk (plus a separate pharmacy address).","source":"https://www.drharris.co.uk/contact-us"}],"positioning":"Historic independent London chemist and perfumer (established 1790 and a Royal Warrant holder, per research) rooted in St James's.","target_customer":"St James's and Mayfair residents, international hotel guests, classic grooming enthusiasts and gift buyers.","distinctive":"Arlington and Windsor colognes, mahogany shaving bowls and travel grooming sets.","why_local":"Compact, non-perishable grooming and fragrance gifts could reach Mayfair, Westminster and Victoria hotels/offices from SW1A 1HD within the hour.","angle":"Booster can give D. R. Harris & Co. a 60-minute St James's courier channel for retail colognes and grooming gifts, strictly scoped to non-pharmacy lifestyle products.","fit_notes":[["Brand & audience fit","4/5","Venerable independent SW1 institution with local and tourist appeal."],["Product suitability","4/5","Small bottles, soaps and grooming kits fit compact courier bags."],["Customer use case","4/5","Forgot-to-pack hotel toiletries, classic British gifts and replenishment."],["Operational fit","3/5","Single retail site; regulated pharmacy items must be excluded."],["Digital readiness","3/5","Functional ecommerce with clear departmental emails; real-time stock unverified."]],"objections":["Inventory accuracy: does 29 St. James's Street keep real-time digital stock separate from warehouse stock?","Store picking & packing: can counter staff pick retail items without slowing dispensary traffic?","Courier handover: St James's Street is a busy red route; where can couriers stop safely?","Delivery reliability: how are glass cologne bottles cushioned?","Returns & CS: hygiene rules on sealed cosmetics; how are wrong items resolved?","Customer demand: average basket online vs in store?","Commercial economics: lower-priced items may need a £60–£80 minimum basket."],"unknowns":["Ecommerce platform architecture","Warehouse vs shop fulfilment split","Online average order value","Shop phone number (not in research)","Current delivery options and speeds","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello D. R. Harris team,","subject":"Colognes and grooming gifts from St. James's Street, within the hour","hook":"29 St. James's Street is surrounded by hotels, clubs and offices, where a forgotten razor or a last-minute gift is a common need.","value":"Booster could deliver your colognes, shaving soaps and grooming sets from the shop within the hour, limited strictly to retail lifestyle products, with no pharmacy or prescription items involved.","question":"Are online orders fulfilled from St. James's Street or a separate warehouse, and what is a typical basket size?","visit":"St. James's Street","followup_topic":"same-hour delivery of retail grooming products from St. James's Street","area":"St James's and Mayfair"},"status":"Researched","lat":51.50725,"lon":-0.13955,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":9,"research_score":"18/25","evidence_confidence":"High","name":"Cambridge Satchel","aka":"The Cambridge Satchel Co.","address":"Unit 8, The Market Building, Covent Garden, London","postcode":"WC2E 8RB","other_locations":[],"category":"Accessories & Leather Goods","price_tier":"Premium","ownership":"Small group","current_delivery":"Unknown","has_online_store":"Yes","description":"Handcrafted British leather satchels, crossbody bags, backpacks, tote bags and small leather accessories.","website":"https://www.cambridgesatchel.com","contact_email":"covent.garden@cambridgesatchel.com","contact_phone":"+44 02036 872 350","contact_page":"https://www.cambridgesatchel.com/pages/our-stores","contact_routes":["Email covent.garden@cambridgesatchel.com (Covent Garden shop)","Phone +44 02036 872 350","Stores page: https://www.cambridgesatchel.com/pages/our-stores","Partnership / press / wholesale contact: none separately published on the stores directory page"],"evidence_url":"https://www.cambridgesatchel.com/pages/our-stores","source_urls":["https://www.cambridgesatchel.com/pages/our-stores"],"facts":[{"text":"Shop at Unit 8, The Market Building, Covent Garden, London WC2E 8RB.","source":"https://www.cambridgesatchel.com/pages/our-stores"},{"text":"Shopify ecommerce webstore with store-level email/phone contacts across UK locations.","source":"https://www.cambridgesatchel.com/pages/our-stores"},{"text":"Public Covent Garden shop email covent.garden@cambridgesatchel.com and phone +44 02036 872 350.","source":"https://www.cambridgesatchel.com/pages/our-stores"}],"positioning":"Independent British leather goods brand celebrating UK craftsmanship, structured silhouettes and cultural collaborations.","target_customer":"Creative professionals, design-conscious commuters, international visitors and gift buyers in Covent Garden.","distinctive":"Classic leather satchels, The Poppy bag, collector collaborations and embossing/repair services.","why_local":"Covent Garden is roughly equidistant from W1, WC1 and the City, making Unit 8 a natural central dispatch point for gifts and work bags.","angle":"Booster can turn Cambridge Satchel's Covent Garden Market shop into a central WC2 dispatch hub delivering non-embossed leather bags and gifts across London within an hour.","fit_notes":[["Brand & audience fit","4/5","Recognisable independent British accessories brand with a prime WC2 shop."],["Product suitability","4/5","Structured leather bags are durable with no garment-sizing risk."],["Customer use case","3/5","Birthday/graduation gifting and work-bag replacement; lower impulse urgency."],["Operational fit","4/5","Bags box cleanly, but Unit 8 is inside the pedestrianised Market Building."],["Digital readiness","3/5","Modern Shopify site; per-store stock not shown on product pages."]],"objections":["Inventory accuracy: does Unit 8 hold back-room stock of core styles or display units only?","Store picking & packing: should embossed/personalised bags be excluded from 1-hour dispatch?","Courier handover: how far is the walk from perimeter bays to Unit 8?","Delivery reliability: do larger satchels fit standard cycle/moped boxes?","Returns & CS: can Booster-delivered orders be returned in-store at Covent Garden?","Customer demand: online demand from Central London residents vs tourists?","Commercial economics: £100–£250 price points need disciplined delivery fee sharing."],"unknowns":["Back-room storage capacity at Unit 8","Store-to-web POS integration","Current delivery options and speeds","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello to the Covent Garden team,","subject":"Your Covent Garden shop as a Central London delivery hub","hook":"Unit 8 in the Market Building sits almost equidistant from the West End, Bloomsbury and the City, which makes it a natural base for delivering across Central London.","value":"Booster could deliver satchels and small leather goods from Covent Garden within the hour, for a birthday or graduation gift or a replacement work bag. We'd suggest leaving embossed and personalised pieces out of any pilot.","question":"Does the Covent Garden shop hold back-room stock of core styles, or mainly display pieces?","visit":"Covent Garden","followup_topic":"same-hour delivery from your Covent Garden shop","area":"Covent Garden, the West End and the City"},"status":"Researched","lat":51.51197,"lon":-0.12266,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"},{"research_rank":10,"research_score":"17/25","evidence_confidence":"High","name":"Crockett & Jones","aka":"","address":"26 Royal Exchange, City of London, London","postcode":"EC3V 3LP","other_locations":["69 Jermyn Street, London SW1Y","92 Jermyn Street, London SW1Y"],"category":"Footwear","price_tier":"Luxury","ownership":"Independent","current_delivery":"Unknown","has_online_store":"Yes","description":"Goodyear-welted men's and women's luxury dress shoes, boots, loafers, belts and shoe-care accessories.","website":"https://www.crockettandjones.com","contact_email":"","contact_phone":"020 7929 2111","contact_page":"https://www.crockettandjones.com/pages/royal-exchange","contact_routes":["Enquiry form on the store page: https://www.crockettandjones.com/pages/royal-exchange","Phone 020 7929 2111 (Royal Exchange shop)","No public email published on the Royal Exchange store page","Partnership / press / wholesale contact: none published on the cited page"],"evidence_url":"https://www.crockettandjones.com/pages/royal-exchange","source_urls":["https://www.crockettandjones.com/pages/royal-exchange"],"facts":[{"text":"Shop at 26 Royal Exchange, City of London, EC3V 3LP, plus St James's shops at 69 and 92 Jermyn Street (SW1Y).","source":"https://www.crockettandjones.com/pages/royal-exchange"},{"text":"Royal Exchange shop trades Monday–Friday, 9am–6pm.","source":"https://www.crockettandjones.com/pages/royal-exchange"},{"text":"Store page offers an enquiry form and phone 020 7929 2111; no public email is published there.","source":"https://www.crockettandjones.com/pages/royal-exchange"}],"positioning":"Fifth-generation family-owned Northampton shoemaker (founded 1879, per research) serving City executives and traditional luxury buyers.","target_customer":"Investment bankers, corporate lawyers and senior executives in the Square Mile and St James's.","distinctive":"Hand-finished Goodyear-welted calfskin and suede Oxfords, Derbies, loafers and matching belts.","why_local":"Inside the Royal Exchange, 1-hour delivery could serve City professionals who already know their last and size and need a pair or belt before a dinner or flight.","angle":"Booster can give Crockett & Jones's Royal Exchange shop a 60-minute Square Mile delivery service for repeat clients ordering known lasts and sizes to their EC offices.","fit_notes":[["Brand & audience fit","5/5","Prestigious independent British heritage maker anchored in EC3V and SW1Y."],["Product suitability","3/5","High order values, but shoeboxes are bulkier and footwear has higher fit-return risk."],["Customer use case","3/5","Repeat-buyer replenishment and executive emergencies; first-time buyers prefer fitting."],["Operational fit","3/5","Weekday trading matches City office demand; courtyard courier access."],["Digital readiness","3/5","Online catalogue and pre-order form; live per-size store stock not public."]],"objections":["Inventory accuracy: does 26 Royal Exchange hold deep size runs across core lasts?","Store picking & packing: can staff verify pairs and pack shoeboxes within 15 minutes?","Courier handover: are couriers allowed into the Royal Exchange courtyard?","Delivery reliability: how are multi-box orders (two sizes to compare) handled?","Returns & CS: scheduled return pickups or in-store drop-off for fit returns?","Customer demand: what share of City orders come from repeat clients who know their size?","Commercial economics: high order values absorb courier costs if return rates are modelled."],"unknowns":["Public corporate/partnership email address","Live per-store size stock visibility","Footwear return rates for repeat vs new buyers","Current delivery options and speeds","Full postcodes of the Jermyn Street shops (not in research)","Named decision-maker for partnerships (not published)","Instagram following and customer review ratings (not in research)"],"email":{"greeting":"Hello to the Royal Exchange team,","subject":"Same-hour delivery for City clients from the Royal Exchange","hook":"Your shop at 26 Royal Exchange trades Monday to Friday, right where the City's executives work, many of whom will already know their last and size.","value":"Booster could let those repeat clients order a replacement pair or a belt online and receive it at their office within the hour, before a client dinner or a flight.","question":"Roughly what share of City orders come from repeat clients who already know their size?","visit":"the Royal Exchange","followup_topic":"same-hour delivery to City offices from the Royal Exchange","area":"the Square Mile"},"status":"Researched","lat":51.51383,"lon":-0.08717,"geo_precision":"full postcode","geo_source":"postcodes.io /postcodes (2026-11-21)"}],"meta":{"research_file":"BOUTIQUE_INTELLIGENCE.md.txt","research_date":"2026-11-21","about":"REAL prospects from independent research (BOUTIQUE_INTELLIGENCE.md.txt, Gemini, file dated 2026-11-21). Facts are only those the research attributes to official brand pages, with their source URLs. Everything in 'positioning', 'target_customer', 'why_local', 'angle', 'fit_notes' and 'objections' is a research hypothesis, not a verified fact. Fields absent from the research are left empty and shown as Unknown. None of these brands has expressed interest in partnering with Booster."}}</script>
+<script>
+"use strict";
+/* ============================== data ============================== */
+const RAW = JSON.parse(document.getElementById("app-data").textContent);
+const STATUSES = ["Discovered","Researched","Qualified","Proposal Generated","Contacted","Interested","Not Interested"];
+const DEFAULT_WEIGHTS = {"Product suitability":25,"Customer demand":20,"Geographic suitability":20,"Brand / product value":15,"Digital readiness":10,"Feasibility":10};
+const CRIT_HELP = {
+  "Product suitability":"How well products suit rapid local delivery (size, fragility, giftability).",
+  "Customer demand":"Signals customers want the brand: positioning, social following, reviews.",
+  "Geographic suitability":"Location inside W1 / SW1 / WC / EC and proximity to luxury clusters.",
+  "Brand / product value":"Price positioning and basket value, which pay for premium delivery.",
+  "Digital readiness":"Website, online store and social presence.",
+  "Feasibility":"Speed of decision (ownership) and the size of the delivery gap."
+};
+const CATEGORY_FIT = {
+  "Accessories & Leather Goods":[0.92,"small, robust, high-value items that travel well and suit gifting"],
+  "Jewellery & Watches":[0.88,"compact, high-value and gift-led; needs insured, signed-for handover"],
+  "Food & Confectionery Gifting":[0.86,"compact, deadline-driven gifts with no sizing returns; perishable and heat-sensitive"],
+  "Womenswear":[0.84,"core fashion demand with frequent 'need it tonight' occasions"],
+  "Menswear":[0.82,"strong occasion-led demand (events, travel, tailoring)"],
+  "Beauty & Fragrance":[0.80,"small, replenishable products with repeat purchase"],
+  "Fashion & Lifestyle":[0.80,"fashion plus giftable lifestyle pieces; some glass and sizing returns"],
+  "Concept Store":[0.78,"curated, gift-friendly mix; varied item sizes"],
+  "Footwear":[0.74,"suits delivery but size-fit returns add friction"],
+  "Vintage & Archive":[0.58,"one-off pieces make live inventory sync and returns harder"],
+  "Home & Lifestyle":[0.48,"bulky or fragile items are less suited to rapid courier delivery"]
+};
+const TIER_VALUE = {Luxury:1,Premium:.8,Contemporary:.55,Value:.3};
+const TIER_DEMAND = {Luxury:8,Premium:7,Contemporary:5,Value:3};
+const PRIORITY_DISTRICTS = {"W1S":"Mayfair (Savile Row / Conduit Street)","W1K":"Mayfair (Mount Street / Grosvenor)","W1J":"Mayfair / Piccadilly","W1U":"Marylebone","W1G":"Marylebone (Harley Street side)","SW1X":"Knightsbridge / Belgravia","SW1W":"Belgravia / Pimlico Road","SW1Y":"St James's"};
+const HIGH=80, MED=60;
+const OPPS = {
+  "Accessories & Leather Goods":["Same-day gifting with premium packaging","Hotel and concierge deliveries for visiting shoppers"],
+  "Jewellery & Watches":["Insured, signed-for same-day delivery for gifts","Discreet delivery to offices and hotels"],
+  "Womenswear":["'Need it tonight' occasion-wear delivery","Send-to-try clienteling for VIP clients"],
+  "Menswear":["Same-day delivery of altered or tailored pieces","Last-minute event and travel wardrobe deliveries"],
+  "Beauty & Fragrance":["Rapid replenishment of favourite products","Same-day gifting bundles"],
+  "Concept Store":["Curated gift edits delivered same day","Cross-category bundles for seasonal moments"],
+  "Footwear":["Same-day delivery with a two-size try-on option","Hotel deliveries for visiting shoppers"],
+  "Vintage & Archive":["Delivery of reserved one-off pieces seen on Instagram","Stylist and production deliveries"],
+  "Home & Lifestyle":["Same-day delivery of small giftable homeware","Gifting for housewarmings and events"]
+};
+
+/* ============================== state (local only) ============================== */
+const STORE_KEY = "goBooster.v1";
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { saved = {}; }
+saved.status = saved.status || {}; saved.log = saved.log || {}; saved.drafts = saved.drafts || {};
+let weights = validWeights(saved.weights) ? saved.weights : {...DEFAULT_WEIGHTS};
+function persist(){ try { saved.weights = weights; localStorage.setItem(STORE_KEY, JSON.stringify(saved)); } catch (e) {} }
+function validWeights(w){ return w && Object.keys(DEFAULT_WEIGHTS).every(k => typeof w[k] === "number") && Object.values(w).reduce((a,b)=>a+b,0) === 100; }
+
+const slug = s => s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const ALL = [
+  ...RAW.real.map(r => ({...r, id: slug(r.name), source:"real", is_demo:false})),
+  ...RAW.demo.map(r => ({...r, id: "demo-" + slug(r.name.replace(/\(DEMO\)/,"")), source:"demo", is_demo:true}))
+];
+ALL.forEach(p => { p.baseStatus = p.status; });
+function statusOf(p){ return saved.status[p.id] || p.baseStatus; }
+function logEvent(p, ev){ (saved.log[p.id] = saved.log[p.id] || []).unshift({ts:new Date().toISOString().slice(0,16).replace("T"," "), ev}); persist(); }
+
+/* ============================== geo ============================== */
+function outward(pc){
+  if(!pc) return "";
+  const s = String(pc).toUpperCase().replace(/\s+/g,"");
+  let m = s.match(/^([A-Z]{1,2})(\d[A-Z\d]?)(\d[A-Z]{2})$/); if(m) return m[1]+m[2];
+  m = s.match(/^([A-Z]{1,2})(\d[A-Z\d]?)$/); return m ? m[1]+m[2] : "";
+}
+function isFull(pc){ return /^([A-Z]{1,2})(\d[A-Z\d]?)(\d[A-Z]{2})$/.test(String(pc||"").toUpperCase().replace(/\s+/g,"")); }
+function area(pc){
+  const o = outward(pc); if(!o) return "Unknown";
+  const m = o.match(/^([A-Z]{1,2})(\d+)/); if(!m) return "Unknown";
+  const [_, L, n] = m;
+  if(L==="W" && n==="1") return "W1"; if(L==="SW" && n==="1") return "SW1";
+  if(L==="WC") return "WC"; if(L==="EC") return "EC"; return "Outside target";
+}
+
+/* ============================== scoring (explainable) ============================== */
+const known = v => v !== null && v !== undefined && String(v).trim() !== "" && !["unknown","nan","none"].includes(String(v).trim().toLowerCase());
+const confOf = (k,t) => { const r = t ? k/t : 0; return r >= .99 ? "High" : r >= .5 ? "Medium" : "Low"; };
+function crit(name, frac, reason, conf, missing){ const w = weights[name]; return {name, weight:w, frac, points: Math.round(frac*w*10)/10, reason, conf, missing: missing||[]}; }
+function sProduct(p){
+  const c = CATEGORY_FIT[p.category];
+  return c ? crit("Product suitability", c[0], `${p.category}: ${c[1]}.`, "High")
+           : crit("Product suitability", .4, "Category unknown; cautious default applied.", "Low", ["Product category"]);
+}
+function sDemand(p){
+  let pts=0, parts=[], miss=[], k=0;
+  if(TIER_DEMAND[p.price_tier]){ pts+=TIER_DEMAND[p.price_tier]; k++; parts.push(`${p.price_tier} positioning (${TIER_DEMAND[p.price_tier]}/8)`); }
+  else { pts+=3; miss.push("Price positioning"); parts.push("positioning unknown (3/8 default)"); }
+  const f = p.instagram_followers;
+  if(f !== null && f !== undefined){ k++; const sp = f>=50000?8:f>=10000?6:f>=2000?4:2; pts+=sp; parts.push(`${Number(f).toLocaleString("en-GB")} Instagram followers (${sp}/8)`); }
+  else { pts+=2; miss.push("Instagram follower count"); parts.push("social following unknown (2/8 default)"); }
+  const r = p.google_rating, c = p.review_count;
+  if(r !== null && r !== undefined){ k++; const rp = (r>=4.5 && (c||0)>=50)?4: r>=4.2?3: r>=3.8?2:1; pts+=rp; parts.push(`rating ${Number(r).toFixed(1)}${c!=null?`, ${c} reviews`:""} (${rp}/4)`); }
+  else { pts+=1; miss.push("Customer reviews / rating"); parts.push("reviews unknown (1/4 default)"); }
+  return crit("Customer demand", Math.min(pts,20)/20, parts.join("; ")+".", confOf(k,3), miss);
+}
+function sGeo(p){
+  const a = area(p.postcode), d = outward(p.postcode);
+  if(a==="Unknown") return crit("Geographic suitability", .2, "No valid postcode, so location cannot be assessed.", "Low", ["Postcode"]);
+  const conf = isFull(p.postcode) ? "High" : "Medium", miss = conf==="High" ? [] : ["Full postcode (only district known)"];
+  if(PRIORITY_DISTRICTS[d]) return crit("Geographic suitability", 1, `${d} is in a proposed priority luxury cluster: ${PRIORITY_DISTRICTS[d]}.`, conf, miss);
+  if(a==="W1"||a==="SW1") return crit("Geographic suitability", .85, `${d} is inside the ${a} target area (outside the proposed priority clusters).`, conf, miss);
+  if(a==="WC") return crit("Geographic suitability", .75, `${d} is in the WC target area (Covent Garden / Holborn / Bloomsbury).`, conf, miss);
+  if(a==="EC") return crit("Geographic suitability", .65, `${d} is in the EC target area (City / Clerkenwell); strong weekday office demand (assumption).`, conf, miss);
+  return crit("Geographic suitability", .3, `${d} is outside the W1 / SW1 / WC / EC target area.`, conf, miss);
+}
+function sValue(p){
+  const v = TIER_VALUE[p.price_tier];
+  return v ? crit("Brand / product value", v, `${p.price_tier} price positioning implies ${v>=.8?"high":v>=.5?"moderate":"low"} average order value.`, "High")
+           : crit("Brand / product value", .35, "Price positioning unknown; cautious default applied.", "Low", ["Price positioning"]);
+}
+function sDigital(p){
+  let pts=0, parts=[], miss=[], k=0;
+  if(known(p.website)){ pts+=2; k++; parts.push("website listed (2/2)"); } else { miss.push("Website"); parts.push("no website on record (0/2)"); }
+  if(p.has_online_store==="Yes"){ pts+=5; k++; parts.push("online store live (5/5)"); }
+  else if(p.has_online_store==="No"){ pts+=1; k++; parts.push("no online store (1/5)"); }
+  else { pts+=2; miss.push("Online store (yes/no)"); parts.push("online store unknown (2/5 default)"); }
+  if(known(p.instagram_handle) || (p.instagram_followers||0) > 0){ pts+=3; k++; parts.push("active Instagram presence (3/3)"); }
+  else { pts+=1; miss.push("Instagram handle"); parts.push("social presence unknown (1/3 default)"); }
+  return crit("Digital readiness", pts/10, parts.join("; ")+".", confOf(k,3), miss);
+}
+function sFeas(p){
+  let pts=0, parts=[], miss=[], k=0;
+  const OWN = {"Independent":[6,"owner-led, decisions can be quick"],"Small group":[5,"small group, decisions reasonably quick"],"Brand flagship":[2,"decisions likely sit with head office"]};
+  if(OWN[p.ownership]){ pts+=OWN[p.ownership][0]; k++; parts.push(`${p.ownership}: ${OWN[p.ownership][1]} (${OWN[p.ownership][0]}/6)`); }
+  else { pts+=3; miss.push("Ownership / decision-maker"); parts.push("ownership unknown (3/6 default)"); }
+  const DL = {"None":[4,"no delivery today: clear gap"],"Standard shipping only":[3,"no rapid option today: clear upgrade"],"Same-day / courier":[1,"already offers same-day/courier: smaller gap"]};
+  if(DL[p.current_delivery]){ pts+=DL[p.current_delivery][0]; k++; parts.push(`${DL[p.current_delivery][1]} (${DL[p.current_delivery][0]}/4)`); }
+  else { pts+=2; miss.push("Current delivery offering"); parts.push("current delivery unknown (2/4 default)"); }
+  return crit("Feasibility", pts/10, parts.join("; ")+".", confOf(k,2), miss);
+}
+const CV = {High:1, Medium:.6, Low:.25};
+function score(p){
+  const cs = [sProduct(p), sDemand(p), sGeo(p), sValue(p), sDigital(p), sFeas(p)];
+  const total = Math.round(cs.reduce((a,c)=>a+c.points,0)*10)/10;
+  const wsum = cs.reduce((a,c)=>a+c.weight,0) || 1;
+  const confPct = Math.round(100*cs.reduce((a,c)=>a+CV[c.conf]*c.weight,0)/wsum);
+  const confidence = confPct>=80?"High":confPct>=55?"Medium":"Low";
+  let missing = cs.flatMap(c=>c.missing);
+  if(!known(p.evidence_url) && !p.is_demo) missing.push("Evidence URL / source");
+  if(p.is_demo) missing.push("Everything: demo record is fictional");
+  else if(!known(p.contact_email) && !known(p.contact_phone) && !known(p.contact_page)) missing.push("Public contact route");
+  else missing.push("Named decision-maker (only general public routes published)");
+  missing = [...new Set(missing)];
+  const priority = total>=HIGH?"High":total>=MED?"Medium":"Low";
+  return {total, crits:cs, confidence, confPct, missing, priority, next: nextAction(p,total,confidence,missing)};
+}
+function nextAction(p,total,conf,missing){
+  const st = statusOf(p), pre = p.is_demo ? "DEMO: " : "";
+  if(st==="Not Interested") return "Closed: log the reason and revisit in 6 months if circumstances change.";
+  if(st==="Interested") return "Book an intro call and scope a pilot (products, delivery area, success measures).";
+  if(st==="Contacted") return "If there is no reply after 5 working days, send the follow-up draft yourself.";
+  if(!p.is_demo){ const route = p.contact_email || p.contact_phone || "the published enquiry form";
+    return `Review the personalised email, send it yourself via ${route}, then click 'Mark as contacted'.`; }
+  const gaps = missing.filter(m=>!/contact|decision|demo/i.test(m)).slice(0,3);
+  if(total>=HIGH) return conf==="Low" ? pre+"High potential but low confidence: verify "+gaps.join(", ")+" first." : pre+"Priority lead: research real facts before any outreach.";
+  if(total>=MED) return pre + (gaps.length ? "Promising: research "+gaps.join(", ")+"." : "Promising: qualify with a short call or visit.");
+  return pre+"Low fit on current evidence: deprioritise.";
+}
+
+/* ============================== intelligence & email ============================== */
+const FACT=(t,s)=>({b:"FACT",t,s}), ASSUME=(t,s)=>({b:"ASSUMPTION",t,s:s||"Inferred, not verified"}), UNK=(t)=>({b:"UNKNOWN",t,s:"Needs research"});
+function intelligence(p, sc){
+  if(!p.is_demo){
+    const hyp = "Research hypothesis (not verified)";
+    const fit = Object.fromEntries((p.fit_notes||[]).map(([n,s,t])=>[n.toLowerCase(),[s,t]]));
+    const fi = k => fit[k] ? [ASSUME(`${k[0].toUpperCase()+k.slice(1)} (${fit[k][0]} in research): ${fit[k][1]}`, hyp)] : [];
+    return [
+      ["Verified facts", (p.facts||[]).map(f=>FACT(f.text, f.source))],
+      ["Positioning", [ASSUME(p.positioning, hyp), ...(p.distinctive?[ASSUME("Distinctive products/services: "+p.distinctive,"Research summary (not independently checked)")]:[])]],
+      ["Target customer", [ASSUME(p.target_customer, hyp)]],
+      ["Product & demand", [FACT("Products: "+p.description, p.website), ...fi("product suitability"), ...fi("customer use case"), UNK("Instagram following and customer review ratings were not part of the research.")]],
+      ["Partnership opportunity", [ASSUME(p.why_local, hyp), ASSUME("Angle: "+p.angle, hyp), ...fi("operational fit"), ...fi("digital readiness")]],
+      ["Objections to test", (p.objections||[]).map(o=>ASSUME(o,"Objection hypothesis (research)"))],
+      ["Unknowns", (p.unknowns||[]).map(UNK)]
+    ];
+  }
+  const a = area(p.postcode), src = "DEMO record (fictional, illustrative)";
+  return [
+    ["Positioning", [FACT(`Recorded description: "${p.description}"`, src), known(p.price_tier)?FACT(`Price positioning recorded as ${p.price_tier}.`, src):UNK("Price positioning not established.")]],
+    ["Target customer", [ASSUME(`Likely local residents, office workers and visitors in ${a}.`), UNK("Actual customer mix must be confirmed.")]],
+    ["Product & demand", [ASSUME("Product suitability: "+sc.crits[0].reason), ASSUME(`Demand scored ${sc.crits[1].points}/${sc.crits[1].weight}: ${sc.crits[1].reason}`)]],
+    ["Partnership opportunity", (OPPS[p.category]||["Same-day local delivery"]).map(o=>ASSUME(o))],
+    ["Unknowns", sc.missing.map(UNK)]
+  ];
+}
+function emailFor(p){
+  if(saved.drafts[p.id]) return saved.drafts[p.id];
+  if(!p.is_demo){
+    const e = p.email || {};
+    const body = [e.greeting,"",e.hook,"","I work with Booster. We deliver online orders from a customer's nearest London boutique within the hour, starting in Central London.","",e.value,"",e.question,"",
+      `Would you be open to a 15-minute call, or a short visit to ${e.visit}, to see whether a small, low-commitment pilot makes sense? I'm happy to work around your quieter hours.`,"",
+      "Kind regards,","","[Your name]","[Role], Booster","[Phone] · [Email]"].join("\n");
+    const fbody = [e.greeting,"",`I wanted to follow up briefly on my note about ${e.followup_topic}. I know how busy the shop floor can be.`,"",
+      `To make it easy, I've put together a one-page outline of what a 6–8 week pilot could look like: a short list of products, a delivery area around ${e.area} and simple success measures, with no long-term commitment.`,"",
+      `I'd be happy to drop it in at ${e.visit} or send it by email. Is there a better person or time to speak to?`,"","Kind regards,","","[Your name]","Booster"].join("\n");
+    return {subject:e.subject, body, fsubject:"Re: "+e.subject, fbody};
+  }
+  const name = p.name, use = (OPPS[p.category]||["same-day local delivery for your customers"])[0], d = outward(p.postcode)||"Central London";
+  const body = [`Hello ${name} team,`,"","[DEMO DRAFT: fictional boutique, for illustration only]","",
+    `I've been looking at boutiques around ${d}, and ${name} stood out: ${p.description ? p.description.charAt(0).toLowerCase()+p.description.slice(1).replace(/\.$/,"") : "a strong local offer"}.`,"",
+    "I work with Booster. We deliver online orders from a customer's nearest London boutique within the hour, starting in Central London.","",
+    `For ${name}, we think there's a natural fit around one idea: ${use.charAt(0).toLowerCase()+use.slice(1)}.`,"",
+    "Would you be open to a 15-minute conversation to see whether a small, low-commitment pilot makes sense?","","Kind regards,","","[Your name]","[Role], Booster"].join("\n");
+  return {subject:`${name} × Booster: rapid delivery for your ${d} customers`, body, fsubject:`Re: ${name} × Booster`, fbody:`Hello ${name} team,\n\n[DEMO DRAFT]\n\nA brief follow-up on my note about rapid delivery. Is there a better person or time to speak to?\n\nKind regards,\n\n[Your name]\nBooster`};
+}
+
+/* ============================== helpers ============================== */
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl = u => /^https?:\/\//i.test(String(u||"")) ? String(u) : "";
+const link = (u, label) => safeUrl(u) ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(label||u)}</a>` : esc(label||u||"Unknown");
+const unk = v => known(v) ? esc(v) : '<span class="badge b-unknown">Unknown</span>';
+const srcBadge = p => p.is_demo ? '<span class="badge b-demo">DEMO · fictional</span>' : '<span class="badge b-real">REAL · researched</span>';
+const prioBadge = s => `<span class="badge b-${s.toLowerCase()}">${s} priority</span>`;
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200); }
+function go(h){ location.hash = h; }
+function visible(){ return ALL.filter(p => !p.is_demo || $("#demoToggle").checked); }
+function scored(list){ return list.map(p=>({p, s:score(p)})).sort((a,b)=>b.s.total-a.s.total || (a.p.is_demo-b.p.is_demo)); }
+function download(name, text, type){ const blob = new Blob([text], {type: type||"text/plain;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); }
+async function copyText(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){} ta.remove(); return ok; }
+}
+const csvCell = v => { const s = String(v ?? ""); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+
+/* ============================== views ============================== */
+const FLOW = [["find","Find","Locate the boutique"],["research","Research","Facts vs hypotheses"],["fit","Check fit","Explainable score"],["contact","Contact","Public routes only"],["email","Email","Personalised draft"]];
+
+function vDashboard(){
+  const rows = scored(visible()), real = rows.filter(r=>!r.p.is_demo), demo = rows.filter(r=>r.p.is_demo);
+  const hi = real.filter(r=>r.s.priority==="High").length;
+  const avgReal = real.length ? Math.round(real.reduce((a,r)=>a+r.s.total,0)/real.length) : 0;
+  const contacted = real.filter(r=>["Contacted","Interested"].includes(statusOf(r.p))).length;
+  const counts = STATUSES.map(s=>[s, rows.filter(r=>statusOf(r.p)===s).length]), mx = Math.max(1,...counts.map(c=>c[1]));
+  const top = real.slice(0,6);
+  return `
+  <div class="eyebrow">Boutique acquisition · Central London</div>
+  <h1>Which boutique should Booster approach next, and what should we say?</h1>
+  <p class="sub">Go Booster takes each luxury and premium boutique in W1, SW1, WC and EC through five steps. It separates verified facts from hypotheses, explains every score, and drafts an email for a human to review and send.</p>
+  <div class="flow">${FLOW.map((f,i)=>`<a href="#/p/${top[0]?top[0].p.id:""}/${f[0]}"><div class="n">0${i+1}</div><div class="t">${f[1]}</div><div class="s">${f[2]}</div></a>`).join("")}</div>
+  <hr class="rule">
+  <div class="grid g5">
+    <div class="card kpi"><div class="l">Real prospects</div><div class="v">${real.length}</div><div class="d">researched from official sites</div></div>
+    <div class="card kpi"><div class="l">High priority (real)</div><div class="v">${hi}</div><div class="d">score ≥ ${HIGH}</div></div>
+    <div class="card kpi"><div class="l">Avg score (real)</div><div class="v">${avgReal}</div><div class="d">proposed model, /100</div></div>
+    <div class="card kpi"><div class="l">In conversation</div><div class="v">${contacted}</div><div class="d">real, marked by you in this browser</div></div>
+    <div class="card kpi"><div class="l">Demo records</div><div class="v">${demo.length}</div><div class="d">fictional, labelled DEMO</div></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><h2>Top real prospects</h2>
+      ${top.map((r,i)=>`<div class="top-card"><div class="rank">${i+1}</div><div style="flex:1"><b>${esc(r.p.name)}</b> ${prioBadge(r.s.priority)}<div class="small muted">${esc(r.p.postcode)} · ${esc(r.p.category)} · confidence ${r.s.confPct}%</div></div><div style="text-align:right"><div class="kpi"><div class="v" style="font-size:1.6rem">${r.s.total}</div></div><a class="btn ghost" href="#/p/${r.p.id}/fit">Open</a></div></div>`).join("") || '<p class="muted">No real prospects.</p>'}
+    </div>
+    <div class="card"><h2>Pipeline by stage</h2><p class="small muted" style="margin-top:-6px">Real and demo records combined; demo stages are illustrative.</p>
+      ${counts.map(([s,n])=>`<div class="stagebar"><div>${s}</div><div><div class="b" style="width:${Math.max(2,100*n/mx)}%;${s==="Not Interested"?"background:var(--demo)":s==="Interested"?"background:var(--gold)":""}"></div></div><div>${n}</div></div>`).join("")}
+      <p class="small muted" style="margin-top:10px">Stage changes are saved in this browser only (localStorage). Real prospects start at <i>Researched</i>.</p>
+    </div>
+  </div>`;
+}
+
+let sortKey = "score", sortDir = -1;
+function vProspects(){
+  const cats = [...new Set(ALL.map(p=>p.category))].sort();
+  return `
+  <div class="eyebrow">Step 1 · Find</div><h1>Prospects</h1>
+  <p class="sub">Search, filter and rank every boutique. Click a row to open its workspace. <span class="badge b-real">REAL</span> = researched public facts; <span class="badge b-demo">DEMO</span> = fictional.</p>
+  <div class="filters">
+    <div><label class="f" for="q">Search</label><input type="text" id="q" placeholder="Name, postcode, category…"></div>
+    <div><label class="f" for="fSrc">Source</label><select id="fSrc"><option value="">All</option><option value="real">Real only</option><option value="demo">Demo only</option></select></div>
+    <div><label class="f" for="fArea">Area</label><select id="fArea"><option value="">All</option>${["W1","SW1","WC","EC","Outside target"].map(a=>`<option>${a}</option>`).join("")}</select></div>
+    <div><label class="f" for="fCat">Category</label><select id="fCat"><option value="">All</option>${cats.map(c=>`<option>${esc(c)}</option>`).join("")}</select></div>
+    <div><label class="f" for="fPri">Priority</label><select id="fPri"><option value="">All</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+    <div><label class="f" for="fSt">Stage</label><select id="fSt"><option value="">All</option>${STATUSES.map(s=>`<option>${s}</option>`).join("")}</select></div>
+  </div>
+  <div class="row" style="justify-content:space-between;margin-bottom:8px"><span id="count" class="small muted"></span>
+    <span class="row"><button class="btn ghost" id="exCsv">Export CSV</button><button class="btn ghost" id="exJson">Export JSON</button></span></div>
+  <div class="table-wrap"><table><thead><tr>
+    <th data-k="name">Boutique</th><th data-k="source">Source</th><th data-k="postcode">Postcode</th><th data-k="area">Area</th><th data-k="category">Category</th>
+    <th data-k="score">Score ▾</th><th data-k="priority">Priority</th><th data-k="conf">Confidence</th><th data-k="status">Stage</th><th>Next action</th>
+  </tr></thead><tbody id="tb"></tbody></table></div>`;
+}
+function filteredRows(){
+  const q = ($("#q").value||"").toLowerCase(), src=$("#fSrc").value, ar=$("#fArea").value, cat=$("#fCat").value, pri=$("#fPri").value, st=$("#fSt").value;
+  let rows = scored(visible()).filter(({p,s}) =>
+    (!q || `${p.name} ${p.postcode} ${p.category} ${p.address||""}`.toLowerCase().includes(q)) &&
+    (!src || p.source===src) && (!ar || area(p.postcode)===ar) && (!cat || p.category===cat) && (!pri || s.priority===pri) && (!st || statusOf(p)===st));
+  const key = ({p,s}) => ({name:p.name.toLowerCase(), source:p.source, postcode:p.postcode, area:area(p.postcode), category:p.category, score:s.total, priority:s.total, conf:s.confPct, status:STATUSES.indexOf(statusOf(p))})[sortKey];
+  return rows.sort((a,b)=> (key(a)>key(b)?1:key(a)<key(b)?-1:0)*sortDir);
+}
+function bindProspects(){
+  const draw = () => {
+    const rows = filteredRows();
+    $("#count").textContent = `${rows.length} of ${visible().length} prospects`;
+    $("#tb").innerHTML = rows.map(({p,s}) => `<tr class="click" data-id="${p.id}" tabindex="0">
+      <td><b>${esc(p.name)}</b></td><td>${srcBadge(p)}</td><td>${esc(p.postcode)}</td><td>${area(p.postcode)}</td><td>${esc(p.category)}</td>
+      <td><div class="scorecell">${s.total}<div class="bar" style="flex:1"><div style="width:${s.total}%"></div></div></div></td>
+      <td>${prioBadge(s.priority)}</td><td>${s.confidence} (${s.confPct}%)</td><td><span class="badge b-stage">${statusOf(p)}</span></td><td class="small">${esc(s.next)}</td></tr>`).join("") ||
+      '<tr><td colspan="10" class="muted">No prospects match these filters.</td></tr>';
+    document.querySelectorAll("#tb tr.click").forEach(tr => { tr.onclick = () => go(`#/p/${tr.dataset.id}/find`); tr.onkeydown = e => { if(e.key==="Enter") go(`#/p/${tr.dataset.id}/find`); }; });
+  };
+  ["q","fSrc","fArea","fCat","fPri","fSt"].forEach(id => $("#"+id).addEventListener("input", draw));
+  document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => { const k=th.dataset.k; sortDir = sortKey===k ? -sortDir : (k==="name"||k==="postcode"?1:-1); sortKey=k; draw(); });
+  $("#exCsv").onclick = () => {
+    const head = ["source","name","address","postcode","area","category","price_tier","score","priority","confidence_pct","stage","website","public_email","public_phone","contact_page","evidence_url","next_action"];
+    const lines = [head.join(",")].concat(filteredRows().map(({p,s}) => [p.is_demo?"DEMO (fictional)":"REAL (researched)",p.name,p.address,p.postcode,area(p.postcode),p.category,p.price_tier,s.total,s.priority,s.confPct,statusOf(p),p.website,p.contact_email,p.contact_phone,p.contact_page,p.evidence_url,s.next].map(csvCell).join(",")));
+    download("go-booster-prospects.csv", "﻿"+lines.join("\n"), "text/csv;charset=utf-8"); toast("CSV downloaded");
+  };
+  $("#exJson").onclick = () => { download("go-booster-prospects.json", JSON.stringify(filteredRows().map(({p,s})=>({source:p.source, name:p.name, postcode:p.postcode, score:s.total, priority:s.priority, confidence:s.confPct, stage:statusOf(p), criteria:s.crits.map(c=>({name:c.name, points:c.points, weight:c.weight, reason:c.reason, confidence:c.conf})), missing:s.missing})), null, 2), "application/json"); toast("JSON downloaded"); };
+  draw();
+}
+
+function vWorkspace(id, stage){
+  const list = scored(visible());
+  if(!list.length) return '<p>No prospects visible. Turn on demo records or check the data.</p>';
+  let cur = list.find(r=>r.p.id===id) || list[0];
+  const {p, s} = cur; stage = FLOW.some(f=>f[0]===stage) ? stage : "find";
+  const idx = list.indexOf(cur), prev = list[(idx-1+list.length)%list.length].p.id, next = list[(idx+1)%list.length].p.id;
+  const head = `
+  <div class="row" style="justify-content:space-between">
+    <div style="min-width:260px;flex:1"><label class="f" for="pick">Prospect</label><select id="pick">${list.map(r=>`<option value="${r.p.id}" ${r.p.id===p.id?"selected":""}>${r.p.is_demo?"[DEMO] ":""}${esc(r.p.name)} · ${r.s.total}</option>`).join("")}</select></div>
+    <div class="row"><a class="btn ghost" href="#/p/${prev}/${stage}">← Previous</a><a class="btn ghost" href="#/p/${next}/${stage}">Next →</a></div>
+  </div>
+  ${p.is_demo ? '<div class="notice" style="margin-top:14px"><b>DEMO RECORD.</b> This boutique is fictional. Its figures are illustrative and must not be used for outreach.</div>' : '<div class="notice ok" style="margin-top:14px"><b>REAL PROSPECT.</b> Facts are from official brand pages (linked). Positioning, fit and objections are research hypotheses. This brand has not expressed interest in partnering with Booster.</div>'}
+  <div class="grid" style="grid-template-columns:2fr 1fr 1fr;align-items:stretch" id="wshead">
+    <div><h1 style="margin-bottom:4px">${esc(p.name)}</h1>
+      <div>${srcBadge(p)} ${prioBadge(s.priority)} <span class="badge b-stage">${statusOf(p)}</span> ${!p.is_demo?`<span class="badge b-fact">Evidence: ${esc(p.evidence_confidence)}</span>`:""}</div>
+      <div class="muted small">${esc(p.address||"")} ${esc(p.postcode)} · ${area(p.postcode)} · ${esc(p.category)}</div></div>
+    <div class="card kpi"><div class="l">Fit score</div><div class="v">${s.total}</div><div class="d">${s.priority} priority · /100</div></div>
+    <div class="card kpi"><div class="l">Confidence</div><div class="v">${s.confPct}%</div><div class="d">${s.confidence} · ${s.missing.length} gaps</div></div>
+  </div>
+  <div class="card dark" style="margin-top:12px"><div class="eyebrow" style="color:var(--gold)">Recommended next action</div><div style="margin-top:4px">${esc(s.next)}</div></div>
+  <div class="tabs">${FLOW.map((f,i)=>`<a href="#/p/${p.id}/${f[0]}" class="${f[0]===stage?"on":""}"><span class="n">0${i+1}</span>${f[1]}</a>`).join("")}</div>`;
+  const body = {find:wFind, research:wResearch, fit:wFit, contact:wContact, email:wEmail}[stage](p, s);
+  return head + body;
+}
+function wFind(p){
+  return `<div class="grid g2">
+    <div class="card"><h3>Identity</h3><table>
+      <tr><td class="muted">Official name</td><td><b>${esc(p.name)}</b>${known(p.aka)?` <span class="small muted">(also: ${esc(p.aka)})</span>`:""}</td></tr>
+      <tr><td class="muted">Address</td><td>${unk(p.address)}</td></tr>
+      <tr><td class="muted">Postcode</td><td>${esc(p.postcode)} · district ${outward(p.postcode)} · area ${area(p.postcode)}</td></tr>
+      <tr><td class="muted">Other locations</td><td>${(p.other_locations||[]).length ? p.other_locations.map(esc).join("<br>") : '<span class="muted">None recorded</span>'}</td></tr>
+      <tr><td class="muted">Website</td><td>${known(p.website)?link(p.website):unk("")}</td></tr>
+      <tr><td class="muted">Products</td><td>${unk(p.description)}</td></tr>
+      <tr><td class="muted">Price tier</td><td>${unk(p.price_tier)} <span class="small muted">(classification for scoring)</span></td></tr>
+      <tr><td class="muted">Ownership</td><td>${unk(p.ownership)}</td></tr>
+      <tr><td class="muted">Current delivery</td><td>${unk(p.current_delivery)}</td></tr>
+      <tr><td class="muted">Instagram / reviews</td><td>${p.instagram_followers!=null?esc(Number(p.instagram_followers).toLocaleString("en-GB"))+" followers":unk("")} · ${p.google_rating!=null?esc(p.google_rating)+"★":unk("")}</td></tr>
+      <tr><td class="muted">Map position</td><td>${p.lat!=null?`${p.lat}, ${p.lon} · ${esc(p.geo_precision)} (postcodes.io)`:unk("")}</td></tr>
+    </table></div>
+    <div class="card"><h3>Sources</h3>${p.is_demo ? '<p class="muted">None: this is a fictional demo record.</p>' :
+      `<ul class="list">${(p.source_urls||[]).map(u=>`<li class="src">${link(u)}</li>`).join("")}</ul>
+       <p class="small muted">Research file: ${esc(RAW.meta.research_file)} (${esc(RAW.meta.research_date)}). Research rank #${esc(p.research_rank)}, research fit ${esc(p.research_score)}, evidence confidence ${esc(p.evidence_confidence)}.</p>`}
+      <div class="row" style="margin-top:8px"><a class="btn" href="#/p/${p.id}/research">Next: Research →</a></div></div>
+  </div>`;
+}
+function wResearch(p, s){
+  const secs = intelligence(p, s);
+  return `<p class="small muted">Every line is tagged: <span class="badge b-fact">FACT</span> from an official source (linked) · <span class="badge b-assumption">ASSUMPTION</span> a hypothesis · <span class="badge b-unknown">UNKNOWN</span> needs research.</p>
+  <div class="grid g2">${secs.map(([t,items])=>`<div class="card"><h3>${esc(t)}</h3><ul class="list">${items.map(it=>`<li><span class="badge b-${it.b.toLowerCase()}">${it.b}</span>${esc(it.t)}<div class="src">${safeUrl(it.s)?link(it.s):esc(it.s)}</div></li>`).join("")}</ul></div>`).join("")}</div>
+  <div class="row" style="margin-top:12px"><a class="btn" href="#/p/${p.id}/fit">Next: Check fit →</a></div>`;
+}
+function wFit(p, s){
+  return `<div class="grid" style="grid-template-columns:1.5fr 1fr">
+  <div class="card"><h3>Explainable score: ${s.total}/100</h3><p class="small muted">Weights are a <b>proposed</b> model, not Booster's official criteria. Missing data gets a cautious default and lowers confidence.</p>
+    ${s.crits.map(c=>`<div class="crit"><div class="top"><b>${c.name}</b><span class="pts">${c.points}<span class="small muted"> / ${c.weight}</span></span></div>
+    <div class="bar"><div style="width:${Math.round(c.frac*100)}%"></div></div>
+    <div class="small">${esc(c.reason.charAt(0).toUpperCase()+c.reason.slice(1))}</div>
+    <div><span class="badge b-${c.conf.toLowerCase()}">Confidence: ${c.conf}</span>${c.missing.map(m=>`<span class="badge b-unknown">Missing: ${esc(m)}</span>`).join("")}</div></div>`).join("")}
+  </div>
+  <div>
+    ${!p.is_demo?`<div class="card"><h3>Research assessment (${esc(p.research_score)})</h3><p class="small muted">Independent research's own 5×5 rubric (hypotheses), shown for comparison.</p>
+      <table>${(p.fit_notes||[]).map(([n,sc,t])=>`<tr><td><b>${esc(n)}</b><div class="small muted">${esc(t)}</div></td><td style="white-space:nowrap"><b>${esc(sc)}</b></td></tr>`).join("")}</table></div>`:""}
+    <div class="card" style="margin-top:12px"><h3>Missing information</h3><ul class="list small">${s.missing.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></div>
+    <div class="card" style="margin-top:12px"><h3>Pipeline stage</h3><select id="stageSel">${STATUSES.map(x=>`<option ${x===statusOf(p)?"selected":""}>${x}</option>`).join("")}</select>
+      <div class="row" style="margin-top:8px"><button class="btn" id="stageSave">Update stage</button><a class="btn ghost" href="#/p/${p.id}/contact">Next: Contact →</a></div>
+      <p class="small muted">Saved in this browser only.</p></div>
+  </div></div>`;
+}
+function wContact(p){
+  if(p.is_demo) return `<div class="notice">Demo records have no contact details. Real outreach must use only public, official business channels.</div><a class="btn" href="#/p/${p.id}/email">Next: Email (demo draft) →</a>`;
+  return `<div class="grid g2"><div class="card"><h3>Public contact routes</h3><p class="small muted">Only routes published on official pages are listed. No personal names or private emails are used.</p>
+    <ul class="list">${(p.contact_routes||[]).map(r=>`<li>${esc(r).replace(/(https?:\/\/[^\s]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`)}</li>`).join("")}</ul></div>
+    <div class="card"><h3>Recommended route</h3><table>
+      <tr><td class="muted">Email</td><td>${known(p.contact_email)?`<b>${esc(p.contact_email)}</b>`:unk("")}</td></tr>
+      <tr><td class="muted">Phone</td><td>${unk(p.contact_phone)}</td></tr>
+      <tr><td class="muted">Contact page</td><td>${known(p.contact_page)?link(p.contact_page):unk("")}</td></tr>
+      <tr><td class="muted">Decision-maker</td><td><span class="badge b-unknown">Unknown</span> <span class="small muted">not published</span></td></tr></table>
+      <div class="row" style="margin-top:10px"><a class="btn" href="#/p/${p.id}/email">Next: Email →</a></div></div></div>`;
+}
+function wEmail(p){
+  const e = emailFor(p), sent = ["Contacted","Interested","Not Interested"].includes(statusOf(p));
+  const to = p.is_demo ? "No recipient (fictional demo record)" : (p.contact_email || "No public email: use " + (p.contact_page || "the phone number"));
+  return `<div class="notice info"><b>Drafts only. Nothing is ever sent from Go Booster.</b> Review and edit the draft, send it yourself from your own email account, then click <i>Mark as contacted</i>.</div>
+  ${p.is_demo?'<div class="notice"><b>DEMO DRAFT</b>: fictional boutique; for illustration only.</div>':""}
+  <div class="grid g2">
+    <div class="card"><h3>First email</h3><div class="small muted">To: <b>${esc(to)}</b></div>
+      <label class="f" for="subj">Subject</label><input type="text" id="subj" value="${esc(e.subject)}">
+      <label class="f" for="body" style="margin-top:8px">Body</label><textarea id="body">${esc(e.body)}</textarea></div>
+    <div class="card"><h3>Follow-up (after ~5 working days)</h3><div class="small muted">Only if there is no reply.</div>
+      <label class="f" for="fsubj">Subject</label><input type="text" id="fsubj" value="${esc(e.fsubject)}">
+      <label class="f" for="fbody" style="margin-top:8px">Body</label><textarea id="fbody">${esc(e.fbody)}</textarea></div>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" id="copyMail">Copy email</button>
+    <button class="btn ghost" id="dlMail">Download .txt</button>
+    ${(!p.is_demo && known(p.contact_email)) ? '<button class="btn ghost" id="mailto" title="Opens a draft in your own email app; you decide whether to send it">Open draft in my email app</button>' : ""}
+    <button class="btn ghost" id="saveDraft">Save edits</button>
+    <button class="btn ghost" id="resetDraft">Reset draft</button>
+    <button class="btn gold" id="markSent" ${sent||p.is_demo?"disabled":""}>${sent?"Already marked contacted":"Mark as contacted (I sent it myself)"}</button>
+  </div>
+  <div class="card" style="margin-top:14px"><h3>Activity (this browser)</h3>${(saved.log[p.id]||[]).map(l=>`<div class="small"><span class="muted">${esc(l.ts)}</span> · ${esc(l.ev)}</div>`).join("") || '<p class="small muted">No activity yet.</p>'}</div>`;
+}
+function bindWorkspace(p){
+  const pick = $("#pick"); if(pick) pick.onchange = () => go(`#/p/${pick.value}/${(location.hash.split("/")[3]||"find")}`);
+  const ss = $("#stageSave"); if(ss) ss.onclick = () => { const v=$("#stageSel").value; if(v===statusOf(p)) return toast("Stage unchanged"); logEvent(p, `Stage: ${statusOf(p)} → ${v}`); saved.status[p.id]=v; persist(); toast("Stage updated to "+v); render(); };
+  if(!$("#body")) return;
+  const cur = () => ({subject:$("#subj").value, body:$("#body").value, fsubject:$("#fsubj").value, fbody:$("#fbody").value});
+  $("#copyMail").onclick = async () => toast(await copyText(`Subject: ${$("#subj").value}\n\n${$("#body").value}`) ? "Email copied: paste it into your email app" : "Copy failed: select the text manually");
+  $("#dlMail").onclick = () => { const c=cur(); download(`email-${p.id}.txt`, `To: ${p.contact_email||"(see contact routes)"}\nSubject: ${c.subject}\n\n${c.body}\n\n---- FOLLOW-UP ----\nSubject: ${c.fsubject}\n\n${c.fbody}\n`); toast("Draft downloaded"); };
+  const mt = $("#mailto"); if(mt) mt.onclick = () => { const c=cur(); window.location.href = `mailto:${encodeURIComponent(p.contact_email)}?subject=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`; toast("Opened in your email app: not sent"); };
+  $("#saveDraft").onclick = () => { saved.drafts[p.id]=cur(); logEvent(p,"Draft edited"); toast("Draft saved in this browser"); };
+  $("#resetDraft").onclick = () => { delete saved.drafts[p.id]; persist(); toast("Draft reset"); render(); };
+  $("#markSent").onclick = () => { if(!confirm("Only confirm if you have already sent this email yourself. Mark as contacted?")) return; saved.status[p.id]="Contacted"; logEvent(p,"Marked contacted (sent manually by user)"); toast("Marked as contacted"); render(); };
+}
+
+function vMap(){
+  const rows = scored(visible()).filter(r=>r.p.lat!=null);
+  const W=1000,H=560, lat0=51.484, lat1=51.536, lon0=-0.195, lon1=-0.078;
+  const k = Math.cos(51.51*Math.PI/180);
+  const sx = lon => (lon-lon0)/(lon1-lon0)*W, sy = lat => H-(lat-lat0)/(lat1-lat0)*H;
+  const areas = {}; rows.forEach(({p})=>{ const a=area(p.postcode); if(["W1","SW1","WC","EC"].includes(a)){ (areas[a]=areas[a]||[]).push(p); } });
+  const labels = Object.entries(areas).map(([a,ps])=>{ const x=ps.reduce((s,p)=>s+sx(p.lon),0)/ps.length, y=ps.reduce((s,p)=>s+sy(p.lat),0)/ps.length; return `<text x="${x}" y="${y-38}" text-anchor="middle" fill="rgba(246,241,231,.18)" font-family="Georgia" font-size="56" font-weight="700">${a}</text>`; }).join("");
+  const grid = Array.from({length:9},(_,i)=>`<line x1="${i*W/8}" y1="0" x2="${i*W/8}" y2="${H}" stroke="rgba(246,241,231,.06)"/>`).join("") + Array.from({length:6},(_,i)=>`<line x1="0" y1="${i*H/5}" x2="${W}" y2="${i*H/5}" stroke="rgba(246,241,231,.06)"/>`).join("");
+  const dots = rows.slice().reverse().map(({p,s})=>{ const r = 5 + s.total/9, x=sx(p.lon), y=sy(p.lat);
+    return p.is_demo ? `<circle class="pt" data-id="${p.id}" cx="${x}" cy="${y}" r="${r}" fill="rgba(201,133,121,.25)" stroke="#E7A99E" stroke-width="1.5" stroke-dasharray="3 2" style="cursor:pointer"/>`
+                     : `<circle class="pt" data-id="${p.id}" cx="${x}" cy="${y}" r="${r}" fill="${s.priority==="High"?"#C9A96A":s.priority==="Medium"?"#8FB3A2":"#C98579"}" stroke="#F6F1E7" stroke-width="2" style="cursor:pointer"/>`; }).join("");
+  return `<div class="eyebrow">Where</div><h1>Prospect map</h1>
+  <p class="sub">Positions come from postcodes.io lookups: real prospects use exact full-postcode centroids, demo records district centroids. This is an offline schematic with no basemap tiles, so it works without a server. Click a dot to open the prospect.</p>
+  <div class="legend" style="margin-bottom:8px"><span><i class="dot" style="background:#C9A96A"></i>Real · High</span><span><i class="dot" style="background:#8FB3A2"></i>Real · Medium</span><span><i class="dot" style="background:#C98579"></i>Real · Low</span><span><i class="dot" style="border:2px dashed #E7A99E"></i>Demo (fictional)</span><span class="muted">Dot size = score</span></div>
+  <div class="mapbox"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Schematic map of prospects across Central London">${grid}${labels}
+    <text x="${W-10}" y="${H-10}" text-anchor="end" fill="rgba(246,241,231,.4)" font-size="12">N ↑ · approx. ${((lon1-lon0)*111*k).toFixed(1)} km wide</text>${dots}</svg><div class="tip" id="tip"></div></div>`;
+}
+function bindMap(){
+  const tip = $("#tip"), box = document.querySelector(".mapbox");
+  document.querySelectorAll(".pt").forEach(c => {
+    const p = ALL.find(x=>x.id===c.dataset.id), s = score(p);
+    c.onmousemove = e => { const r = box.getBoundingClientRect(); tip.style.display="block"; tip.style.left=Math.min(e.clientX-r.left+12, r.width-270)+"px"; tip.style.top=(e.clientY-r.top+12)+"px";
+      tip.innerHTML = `<b>${esc(p.name)}</b><br>${p.is_demo?"DEMO · fictional":"REAL · researched"}<br>${esc(p.postcode)} · ${esc(p.category)}<br>Score <b>${s.total}</b> · ${s.priority}`; };
+    c.onmouseleave = () => tip.style.display="none";
+    c.onclick = () => go(`#/p/${p.id}/find`);
+  });
+}
+
+function vScoring(){
+  return `<div class="eyebrow">Step 3 · Check fit</div><h1>Scoring model</h1>
+  <p class="sub">A transparent 100-point model. These weights are a <b>proposed</b> prioritisation for this prototype, not Booster's official criteria. Move the sliders; every score and ranking updates live.</p>
+  <div class="grid g2"><div class="card"><h3>Weights</h3>
+    ${Object.keys(DEFAULT_WEIGHTS).map(k=>`<div class="slider"><label for="w-${slug(k)}" title="${esc(CRIT_HELP[k])}">${k}</label><input type="range" min="0" max="50" step="5" id="w-${slug(k)}" data-k="${k}" value="${weights[k]}"><b id="wv-${slug(k)}">${weights[k]}</b></div>`).join("")}
+    <div id="wsum" class="notice ok">Total: 100</div>
+    <div class="row"><button class="btn" id="wApply">Apply weights</button><button class="btn ghost" id="wReset">Restore defaults</button></div></div>
+    <div class="card"><h3>Live ranking (real prospects)</h3><div id="wprev"></div></div></div>
+  <div class="card" style="margin-top:16px"><h3>How each criterion is scored</h3><div class="table-wrap"><table>
+    <tr><th>Criterion</th><th>Default weight</th><th>Inputs</th></tr>
+    <tr><td>Product suitability</td><td>25</td><td>Category fit for rapid delivery (e.g. leather goods 92%, home & lifestyle 48%)</td></tr>
+    <tr><td>Customer demand</td><td>20</td><td>Price tier (8), Instagram followers (8), rating & reviews (4). Unknowns get cautious defaults.</td></tr>
+    <tr><td>Geographic suitability</td><td>20</td><td>Priority luxury cluster 100%, W1/SW1 85%, WC 75%, EC 65%, outside 30%</td></tr>
+    <tr><td>Brand / product value</td><td>15</td><td>Luxury 100%, Premium 80%, Contemporary 55%, Value 30%</td></tr>
+    <tr><td>Digital readiness</td><td>10</td><td>Website (2), online store (5), Instagram (3)</td></tr>
+    <tr><td>Feasibility</td><td>10</td><td>Ownership (6), current delivery gap (4)</td></tr></table></div>
+    <p class="small muted">Priority: High ≥ ${HIGH} · Medium ${MED}–${HIGH-1} · Low &lt; ${MED}. Confidence = weighted share of criteria backed by data (High 100%, Medium 60%, Low 25%). Missing data never scores zero or full marks.</p></div>`;
+}
+function bindScoring(){
+  const read = () => Object.fromEntries([...document.querySelectorAll("input[type=range]")].map(i=>[i.dataset.k, +i.value]));
+  const preview = () => {
+    const w = read(), sum = Object.values(w).reduce((a,b)=>a+b,0);
+    Object.entries(w).forEach(([k,v])=>$("#wv-"+slug(k)).textContent=v);
+    $("#wsum").className = "notice " + (sum===100?"ok":""); $("#wsum").textContent = sum===100 ? "Total: 100 ✓" : `Total: ${sum}. Weights must add up to 100.`;
+    $("#wApply").disabled = sum!==100;
+    const old = weights; if(sum===100) weights = w;
+    const rows = scored(ALL.filter(p=>!p.is_demo)); weights = old;
+    $("#wprev").innerHTML = `<table><tr><th>#</th><th>Boutique</th><th>Score</th></tr>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.p.name)}</td><td>${r.s.total}</td></tr>`).join("")}</table>`;
+  };
+  document.querySelectorAll("input[type=range]").forEach(i=>i.oninput=preview);
+  $("#wApply").onclick = () => { weights = read(); persist(); toast("Weights applied to all scores"); render(); };
+  $("#wReset").onclick = () => { weights = {...DEFAULT_WEIGHTS}; persist(); toast("Default weights restored"); render(); };
+  preview();
+}
+
+function vAbout(){
+  return `<div class="eyebrow">How it works</div><h1>From a long list to a well-researched, human-approved email</h1>
+  <p class="sub">Booster grows when a boutique says yes. Go Booster turns its acquisition steps into one consistent workflow.</p>
+  <div class="grid g5">${FLOW.map((f,i)=>`<div class="card"><div class="eyebrow">0${i+1}</div><h3>${f[1]}</h3><p class="small">${["Search and filter boutiques in W1, SW1, WC and EC. Real and demo records are always labelled.","See verified facts with source links, kept separate from hypotheses and unknowns.","An explainable 100-point score with per-criterion reasons, confidence and missing data.","Only public, official contact routes. Personal names and private emails are never used.","A personalised first email and follow-up built from verified facts. Copy it, download it or open it in your own email app. Nothing is sent automatically."][i]}</p></div>`).join("")}</div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><h3>Anti-hallucination rules</h3><ul class="list small">
+      <li><b>FACT</b> only when an official source is linked; otherwise <b>ASSUMPTION</b> or <b>UNKNOWN</b>.</li>
+      <li>No invented contacts, statistics, partnerships or commercial terms.</li>
+      <li>Unknown fields stay Unknown and lower the confidence score.</li>
+      <li>Demo records are fictional and labelled in every view.</li>
+      <li>A human reviews, sends and logs every email.</li></ul></div>
+    <div class="card"><h3>Data in this build</h3><ul class="list small">
+      <li><b>${RAW.real.length} real prospects</b> from independent public research (${esc(RAW.meta.research_file)}, ${esc(RAW.meta.research_date)}) using official brand pages.</li>
+      <li><b>${RAW.demo.length} demo records</b>: fictional boutiques for demonstrating the ranking.</li>
+      <li>Coordinates: postcodes.io (ONS / Ordnance Survey open data), looked up at build time.</li>
+      <li>Everything runs in your browser. No server, no API key, no tracking. Edits are saved only in this browser (localStorage).</li>
+      <li><button class="btn ghost" id="clearLocal">Clear my local edits</button></li></ul></div>
+  </div>`;
+}
+
+/* ============================== router ============================== */
+function render(){
+  const parts = (location.hash || "#/dashboard").slice(2).split("/");
+  const view = parts[0] || "dashboard";
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.v === view));
+  const app = $("#app");
+  if(view==="prospects"){ app.innerHTML = vProspects(); bindProspects(); }
+  else if(view==="p"){ app.innerHTML = vWorkspace(parts[1], parts[2]); const list=scored(visible()); const cur=(list.find(r=>r.p.id===parts[1])||list[0]); if(cur) bindWorkspace(cur.p); }
+  else if(view==="map"){ app.innerHTML = vMap(); bindMap(); }
+  else if(view==="scoring"){ app.innerHTML = vScoring(); bindScoring(); }
+  else if(view==="about"){ app.innerHTML = vAbout(); $("#clearLocal").onclick = () => { if(confirm("Clear stages, drafts and weights saved in this browser?")){ try{localStorage.removeItem(STORE_KEY);}catch(e){} saved={status:{},log:{},drafts:{}}; weights={...DEFAULT_WEIGHTS}; toast("Local edits cleared"); render(); } }; }
+  else { app.innerHTML = vDashboard(); }
+  document.title = "Go Booster · " + ({prospects:"Prospects",p:"Workspace",map:"Map",scoring:"Scoring model",about:"How it works"}[view] || "Dashboard");
+}
+$("#demoToggle").onchange = render;
+window.addEventListener("hashchange", () => { render(); window.scrollTo(0,0); });
+const qs = new URLSearchParams(location.search); if(qs.get("demo")==="0") $("#demoToggle").checked = false;
+render();
+</script>
+</body>
+</html>
